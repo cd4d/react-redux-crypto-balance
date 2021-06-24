@@ -1,26 +1,111 @@
-import { React } from "react";
-import BalanceList from "./balance-list/BalanceList"
-import BalanceNews from "./balance-news/BalanceNews"
-import BalanceChart from "./balance-chart/BalanceChart"
+import { React, useState, useEffect } from "react";
+import BalanceList from "./balance-list/BalanceList";
+import BalanceNews from "./balance-news/BalanceNews";
+import BalanceChart from "./balance-chart/BalanceChart";
 
-export default function Balance(props){
-    return(
-<div class="container">
-  <div class="row">
+export default function Balance(props) {
+  const DEFAULT_BALANCE = [
+    {
+      name: "Bitcoin",
+      id: "bitcoin",
+      symbol: "BTC",
+      rate: 30000,
+      amount: 0.5,
+      subUnit: "Satoshi",
+      subUnitToUnit: 100000000,
+    },
+    {
+      name: "Ethereum",
+      id: "ethereum",
+      symbol: "ETH",
+      rate: 2000,
+      amount: 3,
+      subUnit: "GWei",
+      subUnitToUnit: 1000000000,
+    },
+    {
+      name: "Tether",
+      id: "tether",
+      symbol: "USDT",
+      rate: 1,
+      amount: 3000,
+    },
 
-    <div class="col-md-6 col-sm-12">
-      <BalanceList currency={props.currency} balance={props.balance}></BalanceList>
+    {
+      name: "Dogecoin",
+      id: "dogecoin",
+      symbol: "DOGE",
+      rate: 1,
+      amount: 4000,
+    },
+    {
+      name: "Cardano",
+      id: "cardano",
+      symbol: "ADA",
+      rate: 1,
+      amount: 150,
+    },
+    {
+      name: "Ripple",
+      id: "ripple",
+      symbol: "XRP",
+      rate: 1,
+      amount: 200,
+    },
+  ];
+  const [balance, setBalance] = useState(DEFAULT_BALANCE);
+  let isUpdated = false;
+  let total = 0
+  function calculateBalance() {
+    let tempBalance = balance;
+    // calculate value
+    tempBalance.map((coin) =>  {
+      if (coin.rate && coin.amount) {
+        coin.value = +coin.rate * +coin.amount;
+      }
+      if (coin.value) {
+        total += coin.value;
+      }
+      // get the weight of each
+      if (total && total > 0) {
+        if (coin.value) {
+          coin.weight = coin.value / total;
+        }
+      }
+    });
+    return tempBalance;
+  }
+ function updateBalance(newBalance){
+  setBalance(newBalance)
+  }
+
+  useEffect(() => {
+    let tempBalance = calculateBalance();
+    const callCalculateBalance = () => {
+      setBalance(tempBalance);
+    };
+    callCalculateBalance();
+  });
+
+  return (
+    <div className="container">
+      <div className="row">
+        <div className="col-md-6 col-sm-12">
+          <BalanceList
+            currency={props.currency}
+            balance={balance}
+            onUpdateBalance={() => updateBalance(balance)}
+          ></BalanceList>
+        </div>
+        <div className="col-md-6 col-sm-12 ">
+          <BalanceChart
+            currency={props.currency}
+            balance={balance}
+          ></BalanceChart>
+
+          <BalanceNews balance={balance}></BalanceNews>
+        </div>
+      </div>
     </div>
-    <div class="col-md-6 col-sm-12 ">
-    <BalanceChart currency={props.currency} balance={props.balance}></BalanceChart>
- 
-    <BalanceNews balance={props.balance}></BalanceNews>
-
-    </div>
-  </div>
-  
-</div>
-
-        
-    )
+  );
 }
