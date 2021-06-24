@@ -4,7 +4,7 @@ import { Column } from "primereact/column";
 import { InputNumber } from "primereact/inputnumber";
 
 export default function BalanceList(props) {
-  console.log(props.balance);
+  // console.log(props.balance);
   const [balanceData, setBalanceData] = useState(props.balance);
   const formatCurrency = (value, inputCurrency) => {
     return value.toLocaleString("en-US", {
@@ -16,17 +16,17 @@ export default function BalanceList(props) {
     return formatCurrency(rowData.rate || rowData.value, "usd");
   };
   // editing amount
-  const onEditorAmountChange = (props, value) => {
-    let updatedBalance = [...props.value];
+  const onEditorAmountChange = (tableProps, value) => {
+    let updatedBalance = [...tableProps.value];
     // props is the table event
-    updatedBalance[props.rowIndex][props.field] = value;
+    updatedBalance[tableProps.rowIndex][tableProps.field] = value;
     props.onUpdateBalance(updatedBalance);
   };
-  const amountEditor = (props) => {
+  const amountEditor = (tableProps) => {
     return (
       <InputNumber
-        value={props.rowData["amount"]}
-        onValueChange={(e) => onEditorAmountChange(props, e.value)}
+        value={tableProps.rowData["amount"]}
+        onValueChange={(event) => onEditorAmountChange(tableProps, event.value)}
         showButtons
         min={0}
    

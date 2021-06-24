@@ -54,7 +54,7 @@ export default function Balance(props) {
     },
   ];
   const [balance, setBalance] = useState(DEFAULT_BALANCE);
-  let isUpdated = false;
+  const [isUpdated, setIsUpdated] = useState(false)
   let total = 0
   function calculateBalance() {
     let tempBalance = balance;
@@ -77,6 +77,7 @@ export default function Balance(props) {
   }
  function updateBalance(newBalance){
   setBalance(newBalance)
+  setIsUpdated(prevState => !prevState)
   }
 
   useEffect(() => {
@@ -94,13 +95,14 @@ export default function Balance(props) {
           <BalanceList
             currency={props.currency}
             balance={balance}
-            onUpdateBalance={() => updateBalance(balance)}
+            onUpdateBalance={(newBalance) => updateBalance(newBalance)}
           ></BalanceList>
         </div>
         <div className="col-md-6 col-sm-12 ">
           <BalanceChart
             currency={props.currency}
             balance={balance}
+            isUpdated={isUpdated}
           ></BalanceChart>
 
           <BalanceNews balance={balance}></BalanceNews>
