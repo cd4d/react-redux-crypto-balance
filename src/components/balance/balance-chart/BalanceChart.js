@@ -1,44 +1,45 @@
 import { React, useState, useEffect, useRef } from "react";
 import { Chart } from "primereact/chart";
 export default function BalanceChart(props) {
-  const [formattedData, setFormattedData] = useState({
-    labels: [],
+  const initialChartData = {
+    labels: ["a", "b", "c"],
     datasets: [
       {
-        data: [],
+        data: ["1000", "2000", "3000"],
         backgroundColor: ["#42A5F5", "#66BB6A", "#FFA726"],
         hoverBackgroundColor: ["#64B5F6", "#81C784", "#FFB74D"],
       },
     ],
-  });
-  const chartRef = useRef(null)
+  };
+  const [formattedData, setFormattedData] = useState(initialChartData);
+  const chartRef = useRef(null);
 
-  console.log(props);
+  //console.log(props);
+
 
   useEffect(() => {
     function formatData() {
-      console.log("formatting data");
+      //console.log("formatting data");
       let tempData = { coinNames: [], coinValues: [] };
       props.balance.map((coin) => {
         tempData.coinNames.push(coin.name);
         tempData.coinValues.push(coin.value);
         return coin;
       });
-      setFormattedData(prevState => ({ ...prevState, labels: tempData.coinNames, datasets: [{ data: tempData.coinValues }] }))
+      // https://stackoverflow.com/questions/28121272/whats-the-best-way-to-update-an-object-in-an-array-in-reactjs
+      setFormattedData((prevState) => ({
+        ...prevState,
+        labels: tempData.coinNames,
+        datasets: prevState.datasets.map((el) =>
+          el.data ? {...el, data:tempData.coinValues} : {...el}
+        )
+       
+      }));
+      //console.log("formattedData after change: ", formattedData);
     }
-    formatData()
-  }, [props.isUpdated]);
+    formatData();
+  }, [props.balance]);
 
-  const chartData = {
-    labels: [formattedData.coinNames && formattedData.coinNames],
-    datasets: [
-      {
-        data: [formattedData.coinValues && formattedData.coinValues],
-        backgroundColor: ["#42A5F5", "#66BB6A", "#FFA726"],
-        hoverBackgroundColor: ["#64B5F6", "#81C784", "#FFB74D"],
-      },
-    ],
-  };
   const lightOptions = {
     plugins: {
       legend: {
@@ -51,7 +52,7 @@ export default function BalanceChart(props) {
   return (
     <div className="card p-d-flex p-jc-center">
       <Chart
-        type="pie"
+        type="doughnut"
         data={formattedData}
         options={lightOptions}
         style={{ position: "relative", width: "40%" }}

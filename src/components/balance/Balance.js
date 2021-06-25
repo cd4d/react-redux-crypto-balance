@@ -1,4 +1,4 @@
-import { React, useState, useEffect } from "react";
+import { React, useState, useEffect, useCallback } from "react";
 import BalanceList from "./balance-list/BalanceList";
 import BalanceNews from "./balance-news/BalanceNews";
 import BalanceChart from "./balance-chart/BalanceChart";
@@ -54,12 +54,13 @@ export default function Balance(props) {
     },
   ];
   const [balance, setBalance] = useState(DEFAULT_BALANCE);
-  const [isUpdated, setIsUpdated] = useState(false)
-  let total = 0
-  function calculateBalance() {
-    let tempBalance = balance;
+  const [isUpdated, setIsUpdated] = useState(false);
+
+  const calculateBalance = useCallback((currentBalance) => {
+    let total = 0;
+    let tempBalance = currentBalance;
     // calculate value
-    tempBalance.map((coin) =>  {
+    tempBalance.map((coin) => {
       if (coin.rate && coin.amount) {
         coin.value = +coin.rate * +coin.amount;
       }
@@ -72,22 +73,24 @@ export default function Balance(props) {
           coin.weight = coin.value / total;
         }
       }
+      return coin;
     });
     return tempBalance;
-  }
- function updateBalance(newBalance){
-  setBalance(newBalance)
-  setIsUpdated(prevState => !prevState)
-  }
+  }, []);
 
   useEffect(() => {
-    let tempBalance = calculateBalance();
-    const callCalculateBalance = () => {
-      setBalance(tempBalance);
-    };
-    callCalculateBalance();
-  });
+    let tempBalance = calculateBalance(balance);
+    setBalance(tempBalance);
+  }, [calculateBalance, balance]);
 
+  const updateBalance = useCallback(
+    (newBalance) => {
+      let tempBalance = calculateBalance(newBalance);
+      setBalance(tempBalance);
+      setIsUpdated((prevState) => !prevState);
+    },
+    [calculateBalance]
+  );
   return (
     <div className="container">
       <div className="row">
@@ -95,14 +98,19 @@ export default function Balance(props) {
           <BalanceList
             currency={props.currency}
             balance={balance}
-            onUpdateBalance={(newBalance) => updateBalance(newBalance)}
+            //onUpdateBalance={(newBalance) => updateBalance(newBalance)}
+            onUpdateBalance={useCallback(
+              (newBalance) => {
+                updateBalance(newBalance);
+              },
+              [updateBalance]
+            )}
           ></BalanceList>
         </div>
         <div className="col-md-6 col-sm-12 ">
           <BalanceChart
             currency={props.currency}
             balance={balance}
-            isUpdated={isUpdated}
           ></BalanceChart>
 
           <BalanceNews balance={balance}></BalanceNews>

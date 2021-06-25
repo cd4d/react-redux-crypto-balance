@@ -1,11 +1,16 @@
-import { React, useState } from "react";
+import { React, useEffect } from "react";
 import { DataTable } from "primereact/datatable";
 import { Column } from "primereact/column";
 import { InputNumber } from "primereact/inputnumber";
 
-export default function BalanceList(props) {
+export default function BalanceList({balance,onUpdateBalance}) {
   // console.log(props.balance);
-  const [balanceData, setBalanceData] = useState(props.balance);
+  const balanceData = balance;
+
+  useEffect(() => {
+    onUpdateBalance(balanceData);
+  }, [balanceData, onUpdateBalance]);
+
   const formatCurrency = (value, inputCurrency) => {
     return value.toLocaleString("en-US", {
       style: "currency",
@@ -20,7 +25,7 @@ export default function BalanceList(props) {
     let updatedBalance = [...tableProps.value];
     // props is the table event
     updatedBalance[tableProps.rowIndex][tableProps.field] = value;
-    props.onUpdateBalance(updatedBalance);
+    onUpdateBalance(updatedBalance);
   };
   const amountEditor = (tableProps) => {
     return (
@@ -29,7 +34,6 @@ export default function BalanceList(props) {
         onValueChange={(event) => onEditorAmountChange(tableProps, event.value)}
         showButtons
         min={0}
-   
       />
     );
   };

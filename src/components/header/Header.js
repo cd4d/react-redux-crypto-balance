@@ -6,7 +6,7 @@ export default function Header(props) {
             <div className="navbar navbar-default">
                 <div className="container-fluid">
                     <div className="navbar-header">
-                        <a href="#" className="navbar-brand">Crypto Balance React</a>
+                        <a href="#top" className="navbar-brand">Crypto Balance React</a>
                     </div>
                     <div className="col-md-3">
                         <select className="form-select w-auto float-end me-3" name="currency" id="currency">
