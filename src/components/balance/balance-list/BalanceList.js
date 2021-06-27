@@ -1,12 +1,15 @@
-import { React, useEffect } from "react";
+import { React, useEffect, useState } from "react";
 import { DataTable } from "primereact/datatable";
 import { Column } from "primereact/column";
+import { InputText } from 'primereact/inputtext';
 import { InputNumber } from "primereact/inputnumber";
+import { Button } from 'primereact/button';
 
-export default function BalanceList({balance,onUpdateBalance}) {
-  // console.log(props.balance);
+
+
+export default function BalanceList({ balance, onUpdateBalance }) {
   const balanceData = balance;
-
+  const [addCoinInputDisplayed, setAddCoinInputDisplayed] = useState(false)
   useEffect(() => {
     onUpdateBalance(balanceData);
   }, [balanceData, onUpdateBalance]);
@@ -37,9 +40,45 @@ export default function BalanceList({balance,onUpdateBalance}) {
       />
     );
   };
+  function onDeleteCoin(coin) {
+    const updatedBalance = balanceData.filter(el => el.id !== coin.id)
+    onUpdateBalance(updatedBalance)
+  }
+  function onAddCoin(coin) {
+    const updatedBalance = balanceData
+    updatedBalance.push(coin)
+    onUpdateBalance(updatedBalance)
+  }
+  function deleteButton(coinClicked) {
+    return (<Button onClick={() => onDeleteCoin(coinClicked)}
+      icon="pi pi-times"
+    />)
+  }
+  function toggleAddCoin() {
+    setAddCoinInputDisplayed(prevState => !prevState)
+  }
+
   return (
     <>
       <h3>Balance List</h3>
+      {addCoinInputDisplayed ? <Button label="Add coin" onClick={toggleAddCoin} /> :
+        <div> <InputText id="search-box" placeholder="Coin name"
+        />
+          <InputText id="add-coin-input-amount" placeholder="Coin name"
+          />
+
+          <div className="col pt-2">
+            <span style={{ cursor: "pointer" }} onClick={() => onAddCoin()}><span
+              className="pi pi-check"></span></span>
+            <span style={{ cursor: "pointer" }} onClick={toggleAddCoin}><span className="pi pi-times"></span></span>
+          </div>
+
+
+        </div>
+
+
+      }
+
       <div>
         <div className="card">
           <DataTable value={balanceData}>
@@ -58,12 +97,13 @@ export default function BalanceList({balance,onUpdateBalance}) {
               editor={(props) => amountEditor(props)}
             ></Column>
             <Column field="value" header="Value" sortable></Column>
+            <Column body={(coinClicked) => deleteButton(coinClicked)} header="Delete" ></Column>
+
+
           </DataTable>
         </div>
       </div>
-      {/* {props.balance.map(coin =>
-                <p>{coin.name}</p>
-            )} */}
+
     </>
   );
 }
