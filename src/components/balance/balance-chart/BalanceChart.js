@@ -1,4 +1,4 @@
-import { React, useState, useEffect, useRef } from "react";
+import { React, useState, useEffect } from "react";
 import { Chart } from "primereact/chart";
 export default function BalanceChart(props) {
   const initialChartData = {
@@ -12,7 +12,6 @@ export default function BalanceChart(props) {
     ],
   };
   const [formattedData, setFormattedData] = useState(initialChartData);
-  const chartRef = useRef(null);
 
   //console.log(props);
 
@@ -40,9 +39,11 @@ export default function BalanceChart(props) {
     formatData();
   }, [props.balance]);
 
-  const lightOptions = {
+  const chartOptions = {
+responsive:false,
     plugins: {
       legend: {
+        position:"bottom",
         labels: {
           color: "#495057",
         },
@@ -50,13 +51,13 @@ export default function BalanceChart(props) {
     },
   };
   return (
-    <div className="card p-d-flex p-jc-center">
+    <div className="" >
       <Chart
         type="doughnut"
         data={formattedData}
-        options={lightOptions}
-        style={{ position: "relative", width: "40%" }}
-        ref={chartRef}
+        options={chartOptions}
+        // style={{ minWidth:"20vw",maxWidth:"23vw"}}
+        // style={{position: "relative", height:"45vh", width:"23vw"}}
       />
     </div>
   );
