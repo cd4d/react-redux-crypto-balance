@@ -12,6 +12,7 @@ export default function BalanceList({ balance, onUpdateBalance }) {
   }, [balanceData, onUpdateBalance]);
 
   const formatCurrency = (value, inputCurrency) => {
+    console.log(value);
     return value.toLocaleString("en-US", {
       style: "currency",
       currency: inputCurrency ? inputCurrency : "USD",
