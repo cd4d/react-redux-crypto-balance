@@ -31,27 +31,27 @@ export default function Balance(props) {
       amount: 3000,
     },
 
-    {
-      name: "Dogecoin",
-      id: "dogecoin",
-      symbol: "DOGE",
-      rate: 1,
-      amount: 4000,
-    },
-    {
-      name: "Cardano",
-      id: "cardano",
-      symbol: "ADA",
-      rate: 1,
-      amount: 150,
-    },
-    {
-      name: "Ripple",
-      id: "ripple",
-      symbol: "XRP",
-      rate: 1,
-      amount: 200,
-    },
+    // {
+    //   name: "Dogecoin",
+    //   id: "dogecoin",
+    //   symbol: "DOGE",
+    //   rate: 1,
+    //   amount: 4000,
+    // },
+    // {
+    //   name: "Cardano",
+    //   id: "cardano",
+    //   symbol: "ADA",
+    //   rate: 1,
+    //   amount: 150,
+    // },
+    // {
+    //   name: "Ripple",
+    //   id: "ripple",
+    //   symbol: "XRP",
+    //   rate: 1,
+    //   amount: 200,
+    // },
   ];
   const [balance, setBalance] = useState(DEFAULT_BALANCE);
   const [isUpdated, setIsUpdated] = useState(false);
@@ -98,7 +98,7 @@ export default function Balance(props) {
           <BalanceList
             currency={props.currency}
             balance={balance}
-            //onUpdateBalance={(newBalance) => updateBalance(newBalance)}
+
             onUpdateBalance={useCallback(
               (newBalance) => {
                 updateBalance(newBalance);

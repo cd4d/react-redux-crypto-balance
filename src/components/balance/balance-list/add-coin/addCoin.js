@@ -16,7 +16,7 @@ export default function AddCoin({ balance, onUpdateBalance }) {
   const [selectedCoin, setSelectedCoin] = useState({ id: "", amount: 0 });
 
   const searchCoin = useCallback((enteredInput) => {
-    console.log("searchCoin input: ", enteredInput);
+    // console.log("searchCoin input: ", enteredInput);
     let result = [];
     if (!enteredInput.trim()) {
       return [];
@@ -37,17 +37,15 @@ export default function AddCoin({ balance, onUpdateBalance }) {
   }, []);
 
   // searching coin name from local coin list
+  // debounce hook
   useEffect(() => {
     const timer = setTimeout(() => {
       // executes search function only every 500ms
-      //console.log("searching for: ", selectedCoin);
       const results = searchCoin(searchInput);
-      console.log("adding to results: ", results);
       setResultSearch(results);
     }, 500);
     return () => {
       // resets the timer, only last timer active (debouncing)
-      console.log("cleanup");
       clearTimeout(timer);
     };
   }, [searchInput, searchCoin]);
@@ -56,39 +54,44 @@ export default function AddCoin({ balance, onUpdateBalance }) {
   useEffect(() => {
     // TODO get real rate from coingecko
     inputCoin(1000, "rate");
-  }, [selectedCoin.name]);
+  }, [selectedCoin.id]);
 
   function toggleAddCoin() {
     setAddCoinInputDisplayed((prevState) => !prevState);
   }
   function onAddCoin(coin) {
     if (coin && coin.id && coin.amount) {
-      // console.log("sending coin: ", coin);
+      console.log("sending coin: ", coin);
       const updatedBalance = balanceData;
       updatedBalance.push(coin);
       console.log("updating balance: ", updatedBalance);
       onUpdateBalance(updatedBalance);
+      closeInput();
     }
   }
   function setSearchCoin(e) {
-    setSearchInput((prevState) => (prevState = e));
+    setSearchInput(e);
   }
   function closeInput() {
     setSearchInput("");
+    setSelectedCoin({ id: "", amount: 0 });
     toggleAddCoin();
   }
 
-  function inputCoin(value, property) {
-    console.log("changing input: ", value);
-    if (typeof value === "string") {
-      value = value.toLowerCase();
+  function inputCoin(input, property) {
+    // convert id to lowercase and update input field
+    if (property === "id") {
+      // filling the input with selected value using ref so debounce hook not triggered
+      inputRef.current.value = input.id;
+      setSelectedCoin(input);
+      // empty result array
+      setResultSearch([]);
+    } else {
+      setSelectedCoin((prevState) => ({
+        ...prevState,
+        [property]: input,
+      }));
     }
-    setSelectedCoin((prevState) => ({
-      ...prevState,
-      [property]: value,
-    }));
-    // empty result array
-    setResultSearch([]);
   }
 
   return (
@@ -97,6 +100,7 @@ export default function AddCoin({ balance, onUpdateBalance }) {
         <div className="row mt-2 mb-2">
           <div className="col ps-0">
             <div>
+              {/* Add coin id input */}
               <InputText
                 ref={inputRef}
                 id="search-box"
@@ -104,8 +108,9 @@ export default function AddCoin({ balance, onUpdateBalance }) {
                 onChange={(e) => {
                   setSearchCoin(e.target.value);
                 }}
-                value={searchInput}
+                //value={searchInput}
               />
+              {/* List of matching coins */}
               {resultSearch && resultSearch.length > 0 && (
                 <ul className="list-group">
                   {resultSearch.map((coin, idx) => (
@@ -114,7 +119,7 @@ export default function AddCoin({ balance, onUpdateBalance }) {
                       className="list-group-item list-group-item-action"
                     >
                       {/* omitting arrow notation causes render bug */}
-                      <span onClick={() => inputCoin(coin.id, "id")}>
+                      <span onClick={() => inputCoin(coin, "id")}>
                         {coin.id}
                       </span>
                     </li>
@@ -123,6 +128,7 @@ export default function AddCoin({ balance, onUpdateBalance }) {
               )}
             </div>
           </div>
+          {/* Add coin amount input */}
           <div className="col ps-0">
             <div>
               <InputText
@@ -130,14 +136,13 @@ export default function AddCoin({ balance, onUpdateBalance }) {
                 min={0}
                 id="add-coin-input-amount"
                 placeholder="Coin amount"
-                value={selectedCoin.amount}
                 onChange={(e) => inputCoin(e.target.value, "amount")}
               />
             </div>
           </div>
 
           <div className="col pt-2">
-            {selectedCoin.name && selectedCoin.amount && (
+            {selectedCoin.id && selectedCoin.amount && (
               <span
                 style={{ cursor: "pointer" }}
                 onClick={() => onAddCoin(selectedCoin)}
