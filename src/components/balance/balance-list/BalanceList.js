@@ -15,6 +15,8 @@ export default function BalanceList({ balance, onUpdateBalance }) {
     console.log(value);
     return value.toLocaleString("en-US", {
       style: "currency",
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 2,
       currency: inputCurrency ? inputCurrency : "USD",
     });
   };

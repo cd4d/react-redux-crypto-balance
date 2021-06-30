@@ -9,11 +9,23 @@ import coinsList from "../../../../coins-list-sorted.json";
 export default function AddCoin({ balance, onUpdateBalance }) {
   const balanceData = balance;
   const inputRef = useRef(null);
+  const RAPID_API_KEY = process.env.REACT_APP_RAPID_API_KEY;
   const [searchInput, setSearchInput] = useState("");
   const [addCoinInputDisplayed, setAddCoinInputDisplayed] = useState(false);
   // the temporary list of coins matching search
   const [resultSearch, setResultSearch] = useState([]);
   const [selectedCoin, setSelectedCoin] = useState({ id: "", amount: 0 });
+
+  //format currency: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number/toLocaleString
+  const formatCurrency = (value, inputCurrency) => {
+    console.log(value);
+    return value.toLocaleString("en-US", {
+      style: "currency",
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 2,
+      currency: inputCurrency ? inputCurrency : "USD",
+    });
+  };
 
   const searchCoin = useCallback((enteredInput) => {
     // console.log("searchCoin input: ", enteredInput);
@@ -53,6 +65,16 @@ export default function AddCoin({ balance, onUpdateBalance }) {
   // fetching rate of new coin
   useEffect(() => {
     // TODO get real rate from coingecko
+    async function fetchRates() {
+      const response = await fetch(
+        "https://api.coingecko.com/api/v3/simple/price?ids=" +
+          selectedCoin.id +
+          "&vs_currencies=usd"
+      );
+      const rates = await response.json();
+      console.log(rates);
+    }
+    fetchRates();
     inputCoin(1000, "rate");
   }, [selectedCoin.id]);
 
@@ -98,6 +120,12 @@ export default function AddCoin({ balance, onUpdateBalance }) {
     <>
       {addCoinInputDisplayed ? (
         <div className="row mt-2 mb-2">
+          <h6>
+            Add coin: {selectedCoin.name}{" "}
+            {selectedCoin.amount > 0 &&
+              selectedCoin.rate &&
+              formatCurrency(selectedCoin.rate * +selectedCoin.amount)}
+          </h6>
           <div className="col ps-0">
             <div>
               {/* Add coin id input */}
