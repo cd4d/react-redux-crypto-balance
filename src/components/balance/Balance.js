@@ -55,6 +55,8 @@ export default function Balance(props) {
   ];
   const [balance, setBalance] = useState(DEFAULT_BALANCE);
   const [isUpdated, setIsUpdated] = useState(false);
+  const [isLoading, setisLoading] = useState(false);
+
   // useRef hook to avoid updating total in a loop with useState
   const total = useRef(0);
   const calculateBalance = useCallback(
@@ -74,7 +76,7 @@ export default function Balance(props) {
               console.log(key);
               coin.rate =
                 response[key][
-                  props.selectedCurrency ? props.selectedCurrency : "usd"
+                props.selectedCurrency ? props.selectedCurrency : "usd"
                 ];
               break;
             }
@@ -100,11 +102,17 @@ export default function Balance(props) {
   );
   const updateBalance = useCallback(
     async (newBalance) => {
+      setisLoading(true)
       const tempBalance = await calculateBalance(newBalance);
+      if (tempBalance) {
+        setisLoading(false)
+      }
       console.log(tempBalance);
       setBalance(tempBalance);
       setIsUpdated((prevState) => !prevState);
-    },
+    }
+    ,
+
     [calculateBalance]
   );
 
@@ -130,6 +138,7 @@ export default function Balance(props) {
             balance={balance}
             total={total.current}
             isUpdated={isUpdated}
+            isLoading={isLoading}
           ></BalanceChart>
 
           <BalanceNews balance={balance}></BalanceNews>

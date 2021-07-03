@@ -6,9 +6,9 @@ export async function fetchRates(coinsList, currency = "usd") {
   try {
     const response = await fetch(
       "https://api.coingecko.com/api/v3/simple/price?ids=" +
-        formattedCoinListForAPI +
-        "&vs_currencies=" +
-        currency.toLowerCase()
+      formattedCoinListForAPI +
+      "&vs_currencies=" +
+      currency.toLowerCase()
     );
     //
     if (!response.ok) {

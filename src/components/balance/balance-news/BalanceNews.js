@@ -1,5 +1,6 @@
 import { React, useState, useEffect } from "react";
 import { Paginator } from "primereact/paginator";
+import { Button } from 'primereact/button';
 import { fetchNews } from "../../../API/API-calls";
 import newsSample from "../../../news-sample.json";
 export default function BalanceNews(props) {
@@ -13,11 +14,13 @@ export default function BalanceNews(props) {
   let currentBalance = props.balance;
   let coinsList = currentBalance.map((coin) => coin.name);
 
-  async function refreshNews(coinsList) {
+  async function refreshNews() {
+    setisLoading(true)
     if (coinsList) {
       const response = await fetchNews(coinsList);
       if (response) {
         setNewsData(response);
+        setisLoading(false)
       }
     }
   }
@@ -37,11 +40,11 @@ export default function BalanceNews(props) {
         </div>
 
         <div className="col-md-2">
-          <p-button
+          <Button
             icon="pi pi-refresh"
-            styleClass="p-button-sm"
+            className="p-button-sm"
             onClick={refreshNews}
-          ></p-button>
+          ></Button>
         </div>
       </div>
       {isLoading && (
@@ -58,22 +61,22 @@ export default function BalanceNews(props) {
           </button>
         </div>
       )}
-      <div>
-        {newsData.value
-          .slice(indexFirstNews, indexLastNews)
-          .map((element, idx) => (
-            <div key={idx} className="list-group">
-              <a href={element.url}>{element.title}</a>
-              <p className="news-description">{}</p>
-            </div>
-          ))}
+      {!isLoading && <div> {newsData.value
+        .slice(indexFirstNews, indexLastNews)
+        .map((element, idx) => (
+          <div key={idx} className="list-group">
+            <a href={element.url}>{element.title}</a>
+            <p className="news-description">{ }</p>
+          </div>
+        ))}
         <Paginator
           first={indexFirstNews}
           rows={newsPerPage}
           totalRecords={newsData.value.length}
           onPageChange={paginate}
         ></Paginator>
-      </div>
+      </div>}
+
     </>
   );
 }
