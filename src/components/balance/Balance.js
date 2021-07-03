@@ -55,7 +55,7 @@ export default function Balance(props) {
   ];
   const [balance, setBalance] = useState(DEFAULT_BALANCE);
   const [isUpdated, setIsUpdated] = useState(false);
-  const [isLoading, setisLoading] = useState(false);
+  const [isBalanceLoading, setIsBalanceLoading] = useState(false);
 
   // useRef hook to avoid updating total in a loop with useState
   const total = useRef(0);
@@ -102,14 +102,15 @@ export default function Balance(props) {
   );
   const updateBalance = useCallback(
     async (newBalance) => {
-      setisLoading(true)
+      setIsBalanceLoading(true)
       const tempBalance = await calculateBalance(newBalance);
       if (tempBalance) {
-        setisLoading(false)
+        setIsBalanceLoading(false)
+        console.log(tempBalance);
+        setBalance(tempBalance);
+        setIsUpdated((prevState) => !prevState);
       }
-      console.log(tempBalance);
-      setBalance(tempBalance);
-      setIsUpdated((prevState) => !prevState);
+
     }
     ,
 
@@ -130,6 +131,7 @@ export default function Balance(props) {
               },
               [updateBalance]
             )}
+            isBalanceLoading={isBalanceLoading}
           ></BalanceList>
         </div>
         <div className="col-md-5 col-sm-12 ">
@@ -138,7 +140,7 @@ export default function Balance(props) {
             balance={balance}
             total={total.current}
             isUpdated={isUpdated}
-            isLoading={isLoading}
+            isBalanceLoading={isBalanceLoading}
           ></BalanceChart>
 
           <BalanceNews balance={balance}></BalanceNews>

@@ -15,7 +15,6 @@ export default function BalanceChart(props) {
     ],
   };
   const [formattedData, setFormattedData] = useState(initialChartData);
-
   //console.log(props);
 
 
@@ -55,12 +54,12 @@ export default function BalanceChart(props) {
   };
   return (
     <>
-      {props.isLoading && (
+      {props.isBalanceLoading && (
         <div>
           <i className="pi pi-spin pi-spinner" style={{ fontSize: "2rem" }}></i>
         </div>
       )}
-      {!props.isLoading && <div className="" >
+      {!props.isBalanceLoading  && <div className="" >
         <h4>Total: {formatCurrency(props.total, props.selectedCurrency)}</h4>
         <Chart
           type="doughnut"

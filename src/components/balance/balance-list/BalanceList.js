@@ -9,7 +9,7 @@ export default function BalanceList({
   balance,
   onUpdateBalance,
   selectedCurrency,
-  calculateBalance,
+  isBalanceLoading,
 }) {
   const balanceData = balance;
   const pageSize = 5;
@@ -53,60 +53,70 @@ export default function BalanceList({
   return (
     <>
       <h3>Balance List</h3>
-      <AddCoin
-        balance={balance}
-        onUpdateBalance={onUpdateBalance}
-        selectedCurrency={selectedCurrency}
-      />
-
-      <div>
-        <div className="card">
-          <DataTable
-            value={balanceData}
-            autoLayout={false}
-            paginator={true}
-            rows={pageSize}
-            sortField="value"
-            sortOrder={-1}
-            className="balance-list-table"
-          >
-            <Column field="name" header="Name" sortable></Column>
-            <Column field="symbol" header="Symbol" sortable></Column>
-            <Column
-              field="rate"
-              header="Rate"
-              body={(coin) =>
-                formatCurrency(
-                  coin.rate,
-                  selectedCurrency ? selectedCurrency : "usd"
-                )
-              }
-              sortable
-            ></Column>
-            <Column
-              field="amount"
-              header="Amount"
-              sortable
-              editor={(props) => amountEditor(props)}
-            ></Column>
-            <Column
-              field="value"
-              header="Value"
-              sortable
-              body={(coin) =>
-                formatCurrency(
-                  coin.value,
-                  selectedCurrency ? selectedCurrency : "usd"
-                )
-              }
-            ></Column>
-            <Column
-              body={(coinClicked) => deleteButton(coinClicked)}
-              header="Delete"
-            ></Column>
-          </DataTable>
+      {isBalanceLoading && (
+        <div>
+          <i className="pi pi-spin pi-spinner" style={{ fontSize: "2rem" }}></i>
         </div>
-      </div>
+      )}
+      {!isBalanceLoading &&
+        <>
+          <AddCoin
+            balance={balance}
+            onUpdateBalance={onUpdateBalance}
+            selectedCurrency={selectedCurrency}
+          />
+
+          <div>
+            <div className="card">
+              <DataTable
+                value={balanceData}
+                autoLayout={false}
+                paginator={true}
+                rows={pageSize}
+                sortField="value"
+                sortOrder={-1}
+                className="balance-list-table"
+              >
+                <Column field="name" header="Name" sortable></Column>
+                <Column field="symbol" header="Symbol" sortable></Column>
+                <Column
+                  field="rate"
+                  header="Rate"
+                  body={(coin) =>
+                    formatCurrency(
+                      coin.rate,
+                      selectedCurrency ? selectedCurrency : "usd"
+                    )
+                  }
+                  sortable
+                ></Column>
+                <Column
+                  field="amount"
+                  header="Amount"
+                  sortable
+                  editor={(props) => amountEditor(props)}
+                ></Column>
+                <Column
+                  field="value"
+                  header="Value"
+                  sortable
+                  body={(coin) =>
+                    formatCurrency(
+                      coin.value,
+                      selectedCurrency ? selectedCurrency : "usd"
+                    )
+                  }
+                ></Column>
+                <Column
+                  body={(coinClicked) => deleteButton(coinClicked)}
+                  header="Delete"
+                ></Column>
+              </DataTable>
+            </div>
+          </div>
+        </>
+      }
+
     </>
   );
 }

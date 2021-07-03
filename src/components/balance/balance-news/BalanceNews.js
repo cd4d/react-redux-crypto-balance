@@ -6,7 +6,7 @@ import newsSample from "../../../news-sample.json";
 export default function BalanceNews(props) {
   const newsPerPage = 5;
   const [error, setError] = useState(null);
-  const [isLoading, setisLoading] = useState(false);
+  const [isNewsLoading, setIsNewsLoading] = useState(false);
   const [indexFirstNews, setIndexFirstNews] = useState(0);
   const [indexLastNews, setIndexLastNews] = useState(newsPerPage);
   const [newsData, setNewsData] = useState(newsSample);
@@ -15,17 +15,22 @@ export default function BalanceNews(props) {
   let coinsList = currentBalance.map((coin) => coin.name);
 
   async function refreshNews() {
-    setisLoading(true)
+    setIsNewsLoading(true)
     if (coinsList) {
       const response = await fetchNews(coinsList);
-      if (response) {
+      // https://learnwithparam.com/blog/how-to-handle-fetch-errors/
+      if (response.status >= 200 && response.status <= 299) {
         setNewsData(response);
-        setisLoading(false)
+      } else {
+        setNewsData(newsSample)
+        console.log("error");
+        setError("Error fetching news.")
       }
+      setIsNewsLoading(false)
     }
   }
   function onCloseError() {
-    return;
+    setError(null)
   }
   function paginate(e) {
     setIndexFirstNews(e.page * newsPerPage + 1);
@@ -47,7 +52,7 @@ export default function BalanceNews(props) {
           ></Button>
         </div>
       </div>
-      {isLoading && (
+      {isNewsLoading && !error && (
         <div>
           <i className="pi pi-spin pi-spinner" style={{ fontSize: "2rem" }}></i>
         </div>
@@ -61,21 +66,22 @@ export default function BalanceNews(props) {
           </button>
         </div>
       )}
-      {!isLoading && <div> {newsData.value
-        .slice(indexFirstNews, indexLastNews)
-        .map((element, idx) => (
-          <div key={idx} className="list-group">
-            <a href={element.url}>{element.title}</a>
-            <p className="news-description">{ }</p>
-          </div>
-        ))}
+      {(!isNewsLoading && !error) && (<div>
+        {newsData.value
+          .slice(indexFirstNews, indexLastNews)
+          .map((element, idx) => (
+            <div key={idx} className="list-group">
+              <a href={element.url}>{element.title}</a>
+              <p className="news-description">{ }</p>
+            </div>
+          ))}
         <Paginator
           first={indexFirstNews}
           rows={newsPerPage}
           totalRecords={newsData.value.length}
           onPageChange={paginate}
         ></Paginator>
-      </div>}
+      </div>)}
 
     </>
   );

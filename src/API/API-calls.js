@@ -26,7 +26,7 @@ export async function fetchRates(coinsList, currency = "usd") {
 
 export async function fetchNews(coinsList) {
   const coinsListFormatted = coinsList.join(",");
-  const newsDataURL = `https://contextualwebsearch-websearch-v1.p.rapidapi.com/api/search/NewsSearchAPI?q=${coinsListFormatted}&pageNumber=1&pageSize=10&autoCorrect=true&fromPublishedDate=null&toPublishedDate=null`;
+  const newsDataURL = `https://contextualwebsearch-websearch-v1.p.rapidapiXXX.com/api/search/NewsSearchAPI?q=${coinsListFormatted}&pageNumber=1&pageSize=10&autoCorrect=true&fromPublishedDate=null&toPublishedDate=null`;
   try {
     const response = await fetch(newsDataURL, {
       headers: {
