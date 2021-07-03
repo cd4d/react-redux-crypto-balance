@@ -3,26 +3,25 @@ import { DataTable } from "primereact/datatable";
 import { Column } from "primereact/column";
 import { InputNumber } from "primereact/inputnumber";
 import { Button } from "primereact/button";
-import  AddCoin  from "./add-coin/addCoin";
-export default function BalanceList({ balance, onUpdateBalance }) {
+import AddCoin from "./add-coin/addCoin";
+import { formatCurrency } from "../../../utils/utils";
+export default function BalanceList({
+  balance,
+  onUpdateBalance,
+  selectedCurrency,
+  calculateBalance,
+}) {
   const balanceData = balance;
+  const pageSize = 5;
+  // get rates first render
+  // useEffect(() => {
+  //   onUpdateBalance(balanceData);
+  // }, []);
 
   useEffect(() => {
     onUpdateBalance(balanceData);
   }, [balanceData, onUpdateBalance]);
 
-  const formatCurrency = (value, inputCurrency) => {
-    console.log(value);
-    return value.toLocaleString("en-US", {
-      style: "currency",
-      minimumFractionDigits: 0,
-      maximumFractionDigits: 2,
-      currency: inputCurrency ? inputCurrency : "USD",
-    });
-  };
-  const currencyBodyTemplate = (rowData) => {
-    return formatCurrency(rowData.rate || rowData.value, "usd");
-  };
   // editing amount
   const onEditorAmountChange = (tableProps, value) => {
     let updatedBalance = [...tableProps.value];
@@ -54,17 +53,34 @@ export default function BalanceList({ balance, onUpdateBalance }) {
   return (
     <>
       <h3>Balance List</h3>
-      <AddCoin balance={balance} onUpdateBalance={onUpdateBalance} />
+      <AddCoin
+        balance={balance}
+        onUpdateBalance={onUpdateBalance}
+        selectedCurrency={selectedCurrency}
+      />
 
       <div>
         <div className="card">
-          <DataTable value={balanceData} autolayout="true">
+          <DataTable
+            value={balanceData}
+            autoLayout={false}
+            paginator={true}
+            rows={pageSize}
+            sortField="value"
+            sortOrder={-1}
+            className="balance-list-table"
+          >
             <Column field="name" header="Name" sortable></Column>
             <Column field="symbol" header="Symbol" sortable></Column>
             <Column
               field="rate"
               header="Rate"
-              body={currencyBodyTemplate}
+              body={(coin) =>
+                formatCurrency(
+                  coin.rate,
+                  selectedCurrency ? selectedCurrency : "usd"
+                )
+              }
               sortable
             ></Column>
             <Column
@@ -73,7 +89,17 @@ export default function BalanceList({ balance, onUpdateBalance }) {
               sortable
               editor={(props) => amountEditor(props)}
             ></Column>
-            <Column field="value" header="Value" sortable></Column>
+            <Column
+              field="value"
+              header="Value"
+              sortable
+              body={(coin) =>
+                formatCurrency(
+                  coin.value,
+                  selectedCurrency ? selectedCurrency : "usd"
+                )
+              }
+            ></Column>
             <Column
               body={(coinClicked) => deleteButton(coinClicked)}
               header="Delete"

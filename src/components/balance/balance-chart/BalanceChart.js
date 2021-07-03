@@ -1,5 +1,7 @@
 import { React, useState, useEffect } from "react";
 import { Chart } from "primereact/chart";
+import { formatCurrency } from "../../../utils/utils";
+
 export default function BalanceChart(props) {
   const initialChartData = {
     labels: ["a", "b", "c"],
@@ -34,10 +36,9 @@ export default function BalanceChart(props) {
         )
        
       }));
-      //console.log("formattedData after change: ", formattedData);
     }
     formatData();
-  }, [props.balance]);
+  }, [props.balance, props.isUpdated]);
 
   const chartOptions = {
 responsive:false,
@@ -52,6 +53,7 @@ responsive:false,
   };
   return (
     <div className="" >
+  <h4>{formatCurrency(props.total,props.selectedCurrency)}</h4>
       <Chart
         type="doughnut"
         data={formattedData}
