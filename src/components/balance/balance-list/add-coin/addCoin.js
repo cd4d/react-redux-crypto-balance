@@ -66,9 +66,13 @@ export default function AddCoin({
   // fetching rate of new coin
   useEffect(() => {
     async function getRates() {
-      const result = await fetchRates([selectedCoin.id], selectedCurrency);
+      let currentRate = 1;
+      const response = await fetchRates([selectedCoin.id], selectedCurrency);
       //ex. {"cardano": {"usd": 1.31 }}
-      const currentRate = await result[selectedCoin.id][selectedCurrency];
+      // TODO add error message
+      if (response.status >= 200 && response.status <= 299) {
+        currentRate = await response[selectedCoin.id][selectedCurrency];
+      }
       inputCoin(+currentRate, "rate");
     }
     // prevents launching at first render

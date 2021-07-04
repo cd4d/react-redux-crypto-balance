@@ -3,7 +3,6 @@ import { Chart } from "primereact/chart";
 import { formatCurrency } from "../../../utils/utils";
 
 export default function BalanceChart(props) {
-
   const initialChartData = {
     labels: ["a", "b", "c"],
     datasets: [
@@ -15,8 +14,8 @@ export default function BalanceChart(props) {
     ],
   };
   const [formattedData, setFormattedData] = useState(initialChartData);
+  //const [isChartLoading, setIsChartLoading] = useState(false);
   //console.log(props);
-
 
   useEffect(() => {
     function formatData() {
@@ -33,10 +32,8 @@ export default function BalanceChart(props) {
         labels: tempData.coinNames,
         datasets: prevState.datasets.map((el) =>
           el.data ? { ...el, data: tempData.coinValues } : { ...el }
-        )
-
+        ),
       }));
-
     }
     formatData();
   }, [props.balance, props.isUpdated]);
@@ -54,22 +51,23 @@ export default function BalanceChart(props) {
   };
   return (
     <>
-      {props.isBalanceLoading && (
+      {props.isChartLoading && (
         <div>
           <i className="pi pi-spin pi-spinner" style={{ fontSize: "2rem" }}></i>
         </div>
       )}
-      {!props.isBalanceLoading  && <div className="" >
-        <h4>Total: {formatCurrency(props.total, props.selectedCurrency)}</h4>
-        <Chart
-          type="doughnut"
-          data={formattedData}
-          options={chartOptions}
-        // style={{ minWidth:"20vw",maxWidth:"23vw"}}
-        // style={{position: "relative", height:"45vh", width:"23vw"}}
-        />
-      </div>}
-
+      {!props.isChartLoading && (
+        <div className="">
+          <h4>Total: {formatCurrency(props.total, props.selectedCurrency)}</h4>
+          <Chart
+            type="doughnut"
+            data={formattedData}
+            options={chartOptions}
+            // style={{ minWidth:"20vw",maxWidth:"23vw"}}
+            // style={{position: "relative", height:"45vh", width:"23vw"}}
+          />
+        </div>
+      )}
     </>
-  )
+  );
 }

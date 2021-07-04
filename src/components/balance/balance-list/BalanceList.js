@@ -1,4 +1,5 @@
-import { React, useEffect } from "react";
+import { React, //useEffect 
+} from "react";
 import { DataTable } from "primereact/datatable";
 import { Column } from "primereact/column";
 import { InputNumber } from "primereact/inputnumber";
@@ -18,9 +19,9 @@ export default function BalanceList({
   //   onUpdateBalance(balanceData);
   // }, []);
 
-  useEffect(() => {
-    onUpdateBalance(balanceData);
-  }, [balanceData, onUpdateBalance]);
+  // useEffect(() => {
+  //   onUpdateBalance(balanceData);
+  // }, [balanceData, onUpdateBalance]);
 
   // editing amount
   const onEditorAmountChange = (tableProps, value) => {

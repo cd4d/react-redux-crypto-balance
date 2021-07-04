@@ -1,4 +1,4 @@
-import { React, useState, useEffect } from "react";
+import { React, useState } from "react";
 import { Paginator } from "primereact/paginator";
 import { Button } from 'primereact/button';
 import { fetchNews } from "../../../API/API-calls";

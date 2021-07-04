@@ -1,4 +1,4 @@
-import { React, useState, useRef, useCallback } from "react";
+import { React, useState, useRef, useCallback, useEffect } from "react";
 import BalanceList from "./balance-list/BalanceList";
 import BalanceNews from "./balance-news/BalanceNews";
 import BalanceChart from "./balance-chart/BalanceChart";
@@ -59,61 +59,91 @@ export default function Balance(props) {
 
   // useRef hook to avoid updating total in a loop with useState
   const total = useRef(0);
-  const calculateBalance = useCallback(
-    async (currentBalance) => {
-      total.current = 0
-      let tempBalance = currentBalance;
-      // fetch rates
-      let coinsList = tempBalance.map((coin) => coin.id);
-      const response = await fetchRates(coinsList, props.selectedCurrency);
-      // calculate value
-      tempBalance.map((coin) => {
-        if (response) {
-          const responseKeys = Object.keys(response);
+  let tempBalance = useRef(balance);
+  useEffect(() => {
+    // fetch rates
+    let coinsList = balance.map((coin) => coin.id);
+    const fetchData = async () => {
+      console.log("fetching data");
+      try {
+        const response = await fetchRates(coinsList, props.selectedCurrency)
+        let formattedResponse = await response.json()
+        console.log(formattedResponse);
+      tempBalance.current.map((coin) => {
+          console.log("changing tempbalance");
+          const responseKeys = Object.keys(formattedResponse);
           for (let i = 0; i < responseKeys.length; i++) {
             let key = responseKeys[i];
             if (key === coin.name.toLowerCase()) {
-              console.log(key);
+              //console.log(key);
               coin.rate =
-                response[key][
-                props.selectedCurrency ? props.selectedCurrency : "usd"
+              formattedResponse[key][
+                  props.selectedCurrency ? props.selectedCurrency : "usd"
                 ];
               break;
             }
           }
-        }
-        if (coin.rate && coin.amount) {
-          coin.value = +coin.rate * +coin.amount;
-        }
-        if (coin.value) {
-          total.current += coin.value;
-        }
-        // get the weight of each
-        if (total && total.current > 0) {
-          if (coin.value) {
-            coin.weight = coin.value / total.current;
-          }
-        }
+     
         return coin;
       });
-      return tempBalance;
-    },
-    [props.selectedCurrency]
-  );
+      } catch (error) {
+        console.log(error);
+      }
+      
+      console.log(tempBalance.current);
+      setBalance(tempBalance.current);
+    };
+    fetchData();
+  }, [balance, props.selectedCurrency]);
+
+  const calculateBalance = useCallback((currentBalance) => {
+    total.current = 0;
+    let tempBalance = currentBalance;
+    // fetch rates
+    // let coinsList = tempBalance.map((coin) => coin.id);
+    // const response =  fetchRates(coinsList, props.selectedCurrency)
+    tempBalance.map((coin) => {
+      // if (response.status >= 200 && response.status <= 299) {
+      //   const responseKeys = Object.keys(response);
+      //   for (let i = 0; i < responseKeys.length; i++) {
+      //     let key = responseKeys[i];
+      //     if (key === coin.name.toLowerCase()) {
+      //       console.log(key);
+      //       coin.rate =
+      //         response[key][
+      //           props.selectedCurrency ? props.selectedCurrency : "usd"
+      //         ];
+      //       break;
+      //     }
+      //   }
+      // }
+      if (coin.rate && coin.amount) {
+        coin.value = +coin.rate * +coin.amount;
+      }
+      if (coin.value) {
+        total.current += coin.value;
+      }
+      // get the weight of each
+      if (total && total.current > 0) {
+        if (coin.value) {
+          coin.weight = coin.value / total.current;
+        }
+      }
+      return coin;
+    });
+    return tempBalance;
+  }, []);
   const updateBalance = useCallback(
     async (newBalance) => {
-      setIsBalanceLoading(true)
-      const tempBalance = await calculateBalance(newBalance);
+      setIsBalanceLoading(true);
+      const tempBalance = calculateBalance(newBalance);
       if (tempBalance) {
-        setIsBalanceLoading(false)
+        setIsBalanceLoading(false);
         console.log(tempBalance);
         setBalance(tempBalance);
         setIsUpdated((prevState) => !prevState);
       }
-
-    }
-    ,
-
+    },
     [calculateBalance]
   );
 
