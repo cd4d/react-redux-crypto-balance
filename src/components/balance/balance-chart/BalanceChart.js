@@ -19,7 +19,7 @@ export default function BalanceChart(props) {
 
   useEffect(() => {
     function formatData() {
-      //console.log("formatting data");
+      console.log("formatting data");
       let tempData = { coinNames: [], coinValues: [] };
       props.balance.map((coin) => {
         tempData.coinNames.push(coin.name);
@@ -27,6 +27,7 @@ export default function BalanceChart(props) {
         return coin;
       });
       // https://stackoverflow.com/questions/28121272/whats-the-best-way-to-update-an-object-in-an-array-in-reactjs
+      console.log(tempData);
       setFormattedData((prevState) => ({
         ...prevState,
         labels: tempData.coinNames,
@@ -36,7 +37,9 @@ export default function BalanceChart(props) {
       }));
     }
     formatData();
-  }, [props.balance, props.isUpdated]);
+  }, [props.balance,
+   props.isUpdated
+  ]);
 
   const chartOptions = {
     responsive: false,
@@ -51,12 +54,12 @@ export default function BalanceChart(props) {
   };
   return (
     <>
-      {props.isChartLoading && (
+      {props.isBalanceLoading && (
         <div>
           <i className="pi pi-spin pi-spinner" style={{ fontSize: "2rem" }}></i>
         </div>
       )}
-      {!props.isChartLoading && (
+      {(
         <div className="">
           <h4>Total: {formatCurrency(props.total, props.selectedCurrency)}</h4>
           <Chart

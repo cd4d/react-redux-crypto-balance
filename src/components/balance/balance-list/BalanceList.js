@@ -70,9 +70,9 @@ export default function BalanceList({
         <div>
           <div className="card">
             <DataTable
-              value={balanceData}
+              value={balance}
               autoLayout={false}
-              paginator={true}
+              paginator={false}
               rows={pageSize}
               sortField="value"
               sortOrder={-1}
