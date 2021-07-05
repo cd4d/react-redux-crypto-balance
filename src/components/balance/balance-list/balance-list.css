@@ -14,7 +14,9 @@
 .table-text-error{
   color:crimson
 }
-
+.amount-input {
+  width: 5rem;
+}
 /* Media queries */
 @media screen and (max-width: 500px) {
     .balance-list-table {

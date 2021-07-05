@@ -1,9 +1,8 @@
 import {
-  React, useEffect, //useEffect 
+  React
 } from "react";
 import { DataTable } from "primereact/datatable";
 import { Column } from "primereact/column";
-import { InputNumber } from "primereact/inputnumber";
 import { Button } from "primereact/button";
 import AddCoin from "./add-coin/addCoin";
 import { formatCurrency } from "../../../utils/utils";
@@ -16,22 +15,23 @@ export default function BalanceList({
   error
 }) {
   const pageSize = 5;
-  let balanceData = balance;
 
   // editing amount
-  const onEditorAmountChange = (tableProps, value) => {
+  const onEditorAmountChange = (tableProps, event) => {
     let updatedBalance = [...tableProps.value];
     // props is the table event
-    updatedBalance[tableProps.rowIndex][tableProps.field] = value;
+    updatedBalance[tableProps.rowIndex][tableProps.field] = event.target.value;
     onUpdateBalance(updatedBalance);
   };
   const amountEditor = (tableProps) => {
     return (
-      <InputNumber
+      <input
+      type="number"
         value={tableProps.rowData["amount"]}
-        onValueChange={(event) => onEditorAmountChange(tableProps, event.value)}
-        showButtons
+        onChange={(event) => onEditorAmountChange(tableProps, event)}
         min={0}
+        className="amount-input"
+
       />
     );
   };

@@ -135,7 +135,7 @@ export default function Balance(props) {
       const tempBalance = calculateBalance(newBalance);
       if (tempBalance) {
         setIsBalanceLoading(false);
-        console.log(tempBalance);
+        // console.log(tempBalance);
         setBalance(tempBalance);
         setIsUpdated((prevState) => !prevState);
       }
