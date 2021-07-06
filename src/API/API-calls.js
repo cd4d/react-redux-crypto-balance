@@ -2,7 +2,7 @@
 
 export async function fetchRates(coinsList, currency = "usd") {
   const formattedCoinListForAPI = coinsList.join("%2C");
-   console.log("fetching rates for: ", coinsList);
+  console.log("fetching rates for: ", coinsList);
   try {
     const response = await fetch(
       "https://api.coingecko.com/api/v3/simple/price?ids=" +
@@ -27,7 +27,7 @@ export async function fetchRates(coinsList, currency = "usd") {
 
 export async function fetchNews(coinsList) {
   const coinsListFormatted = coinsList.join(",");
-  const newsDataURL = `https://contextualwebsearch-websearch-v1.p.rapidapiXXX.com/api/search/NewsSearchAPI?q=${coinsListFormatted}&pageNumber=1&pageSize=10&autoCorrect=true&fromPublishedDate=null&toPublishedDate=null`;
+  const newsDataURL = `https://contextualwebsearch-websearch-v1.p.rapidapi.com/api/search/NewsSearchAPI?q=${coinsListFormatted}&pageNumber=1&pageSize=10&autoCorrect=true&fromPublishedDate=null&toPublishedDate=null`;
   try {
     const response = await fetch(newsDataURL, {
       headers: {
