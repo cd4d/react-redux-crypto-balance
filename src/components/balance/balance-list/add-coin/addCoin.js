@@ -7,17 +7,15 @@ import {
   useContext,
 } from "react";
 import { InputText } from "primereact/inputtext";
-import { Button } from "primereact/button";
 
 // coins list for adding coin search function
 import coinsList from "../../../../coins-list-sorted.json";
 import { fetchRates } from "../../../../API/API-calls";
 import CurrencyContext from "../../../../store/currency-context";
 
-export default function AddCoin({ balance, onUpdateBalance }) {
+export default function AddCoin({ balance, onUpdateBalance,addCoinInputDisplayed,setAddCoinInputDisplayed }) {
   const inputRef = useRef(null);
   const [searchInput, setSearchInput] = useState("");
-  const [addCoinInputDisplayed, setAddCoinInputDisplayed] = useState(false);
   // the temporary list of coins matching search
   const [resultSearch, setResultSearch] = useState([]);
   const [selectedCoin, setSelectedCoin] = useState({ id: "", amount: 0 });
@@ -136,7 +134,7 @@ export default function AddCoin({ balance, onUpdateBalance }) {
               selectedCoin.rate &&
               formatCurrency(selectedCoin.rate * +selectedCoin.amount)}
           </h6>
-          <div className="col ps-0">
+          <div className="col">
             <div>
               {/* Add coin id input */}
               <InputText
@@ -196,7 +194,13 @@ export default function AddCoin({ balance, onUpdateBalance }) {
           </div>
         </div>
       ) : (
-        <Button label="Add coin" onClick={toggleAddCoin} />
+        <button
+          // label="Add coin"
+          onClick={toggleAddCoin}
+          type="button"
+          className="btn btn-primary mt-1 mb-2 btn-sm"
+        ><i className="pi pi-plus" aria-hidden="true"></i>
+            <span className="d-sm-none d-lg-inline"> Add coin</span></button>
       )}
     </>
   );

@@ -1,4 +1,4 @@
-import { React, useContext } from "react";
+import { React, useContext, useState } from "react";
 import { DataTable } from "primereact/datatable";
 import { Column } from "primereact/column";
 import { Button } from "primereact/button";
@@ -12,12 +12,11 @@ export default function BalanceList({
   onUpdateBalance,
   isBalanceLoading,
   error,
-  isUpdated,
+  triggerRatesUpdate,
 }) {
   const pageSize = 5;
   const currencyCtx = useContext(CurrencyContext);
-  // const [balanceData, setBalanceData] = useState(balance)
-  // useEffect(() => { setBalanceData(balance) })
+  const [addCoinInputDisplayed, setAddCoinInputDisplayed] = useState(false);
 
   // editing amount
   const onEditorAmountChange = (tableProps, event) => {
@@ -37,7 +36,9 @@ export default function BalanceList({
       />
     );
   };
-
+  function onRefreshRates() {
+    triggerRatesUpdate();
+  }
   function onDeleteCoin(coin) {
     const updatedBalance = balance.filter((el) => el.id !== coin.id);
     onUpdateBalance(updatedBalance);
@@ -61,12 +62,23 @@ export default function BalanceList({
 
       {!isBalanceLoading && (
         <>
-          <AddCoin balance={balance} onUpdateBalance={onUpdateBalance} />
-          <Button
-            icon="pi pi-refresh"
-            className="p-button-sm"
-            //onClick={onRefreshRates}
-          ></Button>
+          <AddCoin
+            balance={balance}
+            onUpdateBalance={onUpdateBalance}
+            addCoinInputDisplayed={addCoinInputDisplayed}
+            setAddCoinInputDisplayed={setAddCoinInputDisplayed}
+          />
+          {/* Refresh rates button  */}
+          {!addCoinInputDisplayed && (
+            <button
+              type="button"
+              className="btn btn-secondary mt-1 me-1 btn-sm float-end"
+              onClick={onRefreshRates}
+            >
+              <i className="pi pi-refresh" aria-hidden="true"></i>
+              <span className="d-sm-none d-lg-inline"> Refresh rates</span>
+            </button>
+          )}
         </>
       )}
       {/* Alert message if fetching rates unsuccessful  */}

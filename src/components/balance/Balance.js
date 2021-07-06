@@ -1,4 +1,11 @@
-import { React, useState, useRef, useCallback, useEffect, useContext } from "react";
+import {
+  React,
+  useState,
+  useRef,
+  useCallback,
+  useEffect,
+  useContext,
+} from "react";
 import BalanceList from "./balance-list/BalanceList";
 import BalanceNews from "./balance-news/BalanceNews";
 import BalanceChart from "./balance-chart/BalanceChart";
@@ -25,13 +32,13 @@ export default function Balance() {
       subUnit: "GWei",
       subUnitToUnit: 1000000000,
     },
-    // {
-    //   name: "Tether",
-    //   id: "tether",
-    //   symbol: "USDT",
-    //   rate: 1,
-    //   amount: 3000,
-    // },
+    {
+      name: "Tether",
+      id: "tether",
+      symbol: "USDT",
+      rate: 1,
+      amount: 3000,
+    },
 
     // {
     //   name: "Dogecoin",
@@ -56,13 +63,14 @@ export default function Balance() {
     // },
   ];
   const [balance, setBalance] = useState(DEFAULT_BALANCE);
-  const [isUpdated, setIsUpdated] = useState(false);
+  const [chartUpdated, setChartUpdated] = useState(false);
+  const [ratesUpdated, setRatesUpdated] = useState(false);
   const [isBalanceLoading, setIsBalanceLoading] = useState(false);
   const [error, setError] = useState(null);
-  const currencyCtx = useContext(CurrencyContext)
+  const currencyCtx = useContext(CurrencyContext);
   // useRef hook to avoid updating total in a loop with useState
   const total = useRef(0);
-  const tempBalance = useRef(balance)
+  //const tempBalance = useRef(balance);
 
   const calculateBalance = useCallback((currentBalance) => {
     total.current = 0;
@@ -82,13 +90,13 @@ export default function Balance() {
       }
       return coin;
     });
-    triggerUpdate()
+    triggerChartUpdate();
     return tempBalance;
   }, []);
-
   useEffect(() => {
+    let useEffectBalance = balance;
     // fetch rates
-    let coinsList = tempBalance.current.map((coin) => coin.id);
+    let coinsList = useEffectBalance.map((coin) => coin.id);
     setIsBalanceLoading(true);
     setError(null);
     const fetchData = async () => {
@@ -97,16 +105,14 @@ export default function Balance() {
         let formattedResponse;
         if (response) {
           formattedResponse = await response.json();
-          tempBalance.current.map((coin) => {
+          useEffectBalance.map((coin) => {
             const responseKeys = Object.keys(formattedResponse);
             for (let i = 0; i < responseKeys.length; i++) {
               let key = responseKeys[i];
               if (key === coin.name.toLowerCase()) {
                 //console.log(key);
                 coin.rate =
-                  formattedResponse[key][
-                  currencyCtx ? currencyCtx : "usd"
-                  ];
+                  formattedResponse[key][currencyCtx ? currencyCtx : "usd"];
                 break;
               }
             }
@@ -120,15 +126,20 @@ export default function Balance() {
         setError(error.message);
         setIsBalanceLoading(false);
       }
-      calculateBalance(tempBalance.current);
-      setBalance(tempBalance.current);
+      calculateBalance(useEffectBalance);
+      setBalance(useEffectBalance);
     };
     fetchData();
-  }, [calculateBalance, currencyCtx]);
+  }, [calculateBalance, currencyCtx, ratesUpdated]);
 
-  const triggerUpdate = () => {
-    setIsUpdated((prevState) => !prevState);
+  const triggerChartUpdate = () => {
+    setChartUpdated((prevState) => !prevState);
   };
+
+  const triggerRatesUpdate = () => {
+    setRatesUpdated((prevState) => !prevState);
+  };
+
   const updateBalance = (newBalance) => {
     setIsBalanceLoading(true);
     const tempBalance = calculateBalance(newBalance);
@@ -136,9 +147,8 @@ export default function Balance() {
       // console.log(tempBalance);
       setBalance(tempBalance);
       setIsBalanceLoading(false);
-      setIsUpdated((prevState) => !prevState);
     }
-  }
+  };
 
   return (
     <div className="container">
@@ -147,20 +157,17 @@ export default function Balance() {
           <BalanceList
             balance={balance}
             total={total}
-            onUpdateBalance={
-              (newBalance) =>
-                updateBalance(newBalance)
-            }
+            onUpdateBalance={(newBalance) => updateBalance(newBalance)}
             isBalanceLoading={isBalanceLoading}
             error={error}
-            isUpdated={isUpdated}
+            triggerRatesUpdate={triggerRatesUpdate}
           ></BalanceList>
         </div>
         <div className="col-md-5 col-sm-12 ">
           <BalanceChart
             balance={balance}
             total={total.current}
-            isUpdated={isUpdated}
+            isUpdated={chartUpdated}
             isBalanceLoading={isBalanceLoading}
             error={error}
           ></BalanceChart>
