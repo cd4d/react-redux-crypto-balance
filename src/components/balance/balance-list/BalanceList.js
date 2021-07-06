@@ -43,6 +43,8 @@ export default function BalanceList({
       />
     );
   };
+
+
   function onDeleteCoin(coin) {
     const updatedBalance = balance.filter((el) => el.id !== coin.id);
     onUpdateBalance(updatedBalance);
@@ -54,9 +56,7 @@ export default function BalanceList({
     );
   }
 
-  function onValueChange() {
-    console.log("value changed");
-  }
+
 
   return (
     <>
@@ -88,7 +88,6 @@ export default function BalanceList({
       <div>
         <div className="card">
           <DataTable
-            onValueChange={onValueChange}
             lazy={false}
             loading={isBalanceLoading}
             value={balance}

@@ -4,7 +4,7 @@ export async function fetchRates(coinsList, currency = "usd") {
   const formattedCoinListForAPI = coinsList.join("%2C");
   try {
     const response = await fetch(
-      "https://api.coingecko.com/api/v3/simple/price?ids=" +
+      "https://api.coingecko.comX/api/v3/simple/price?ids=" +
         formattedCoinListForAPI +
         "&vs_currencies=" +
         currency.toLowerCase()

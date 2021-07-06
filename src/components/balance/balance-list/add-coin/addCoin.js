@@ -90,16 +90,17 @@ export default function AddCoin({ balance, onUpdateBalance }) {
   function toggleAddCoin() {
     setAddCoinInputDisplayed((prevState) => !prevState);
   }
-  function onAddCoin(coin) {
+
+  function addCoin(coin) {
     if (coin && coin.id && coin.amount) {
-      console.log("sending coin: ", coin);
-      const updatedBalance = balance;
-      updatedBalance.push(coin);
+      // Need to destructure balance to update list
+      const updatedBalance = [...balance, coin];
       console.log("updating balance: ", updatedBalance);
       onUpdateBalance(updatedBalance);
       closeInput();
     }
   }
+
   function setSearchCoin(e) {
     setSearchInput(e);
   }
@@ -145,7 +146,6 @@ export default function AddCoin({ balance, onUpdateBalance }) {
                 onChange={(e) => {
                   setSearchCoin(e.target.value);
                 }}
-                //value={searchInput}
               />
               {/* List of matching coins */}
               {resultSearch && resultSearch.length > 0 && (
@@ -165,10 +165,11 @@ export default function AddCoin({ balance, onUpdateBalance }) {
               )}
             </div>
           </div>
-          {/* Add coin amount input */}
+          {/* Input amount of coin, disabled if no coin selected */}
           <div className="col ps-0">
             <div>
               <InputText
+                disabled={!selectedCoin.id}
                 type="number"
                 min={0}
                 id="add-coin-input-amount"
@@ -179,15 +180,16 @@ export default function AddCoin({ balance, onUpdateBalance }) {
           </div>
 
           <div className="col pt-2">
+            {/* confirm and add coin */}
             {selectedCoin.id && selectedCoin.amount && (
               <span
                 style={{ cursor: "pointer" }}
-                onClick={() => onAddCoin(selectedCoin)}
+                onClick={() => addCoin(selectedCoin)}
               >
                 <span className="pi pi-check"></span>
               </span>
             )}
-
+            {/* close and cancel */}
             <span style={{ cursor: "pointer" }} onClick={closeInput}>
               <span className="pi pi-times"></span>
             </span>
