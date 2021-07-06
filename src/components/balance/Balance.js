@@ -1,9 +1,11 @@
-import { React, useState, useRef, useCallback, useEffect } from "react";
+import { React, useState, useRef, useCallback, useEffect,useContext } from "react";
 import BalanceList from "./balance-list/BalanceList";
 import BalanceNews from "./balance-news/BalanceNews";
 import BalanceChart from "./balance-chart/BalanceChart";
 import { fetchRates } from "../../API/API-calls";
-export default function Balance(props) {
+import  CurrencyContext  from "../../store/currency-context";
+
+export default function Balance() {
   const DEFAULT_BALANCE = [
     {
       name: "Bitcoin",
@@ -57,6 +59,7 @@ export default function Balance(props) {
   const [isUpdated, setIsUpdated] = useState(false);
   const [isBalanceLoading, setIsBalanceLoading] = useState(false);
   const [error, setError] = useState(null);
+  const currencyCtx = useContext(CurrencyContext)
   // useRef hook to avoid updating total in a loop with useState
   const total = useRef(0);
   const tempBalance = useRef(balance)
@@ -79,7 +82,7 @@ export default function Balance(props) {
       }
       return coin;
     });
-    updateRates()
+    triggerUpdate()
     return tempBalance;
   }, []);
 
@@ -89,15 +92,12 @@ export default function Balance(props) {
     setIsBalanceLoading(true);
     setError(null);
     const fetchData = async () => {
-      console.log("fetching rates");
       try {
-        const response = await fetchRates(coinsList, props.selectedCurrency);
+        const response = await fetchRates(coinsList, currencyCtx);
         let formattedResponse;
         if (response) {
           formattedResponse = await response.json();
-          console.log(formattedResponse);
           tempBalance.current.map((coin) => {
-            console.log("changing tempbalance");
             const responseKeys = Object.keys(formattedResponse);
             for (let i = 0; i < responseKeys.length; i++) {
               let key = responseKeys[i];
@@ -105,7 +105,7 @@ export default function Balance(props) {
                 //console.log(key);
                 coin.rate =
                   formattedResponse[key][
-                    props.selectedCurrency ? props.selectedCurrency : "usd"
+                    currencyCtx ? currencyCtx : "usd"
                   ];
                 break;
               }
@@ -124,9 +124,9 @@ export default function Balance(props) {
       setBalance(tempBalance.current);
     };
     fetchData();
-  }, [calculateBalance, props.selectedCurrency]);
+  }, [calculateBalance, currencyCtx]);
 
-  const updateRates = () => {
+  const triggerUpdate = () => {
     setIsUpdated((prevState) => !prevState);
   };
   const updateBalance = useCallback(
@@ -148,7 +148,6 @@ export default function Balance(props) {
       <div className="row">
         <div className="col-md-7 col-sm-12">
           <BalanceList
-            selectedCurrency={props.selectedCurrency}
             balance={balance}
             total={total}
             onUpdateBalance={useCallback(
@@ -159,11 +158,11 @@ export default function Balance(props) {
             )}
             isBalanceLoading={isBalanceLoading}
             error={error}
+            isUpdated={isUpdated}
           ></BalanceList>
         </div>
         <div className="col-md-5 col-sm-12 ">
           <BalanceChart
-            selectedCurrency={props.selectedCurrency}
             balance={balance}
             total={total.current}
             isUpdated={isUpdated}

@@ -1,15 +1,20 @@
-import { React, useEffect, useRef, useState, useCallback } from "react";
+import {
+  React,
+  useEffect,
+  useRef,
+  useState,
+  useCallback,
+  useContext,
+} from "react";
 import { InputText } from "primereact/inputtext";
 import { Button } from "primereact/button";
 
 // coins list for adding coin search function
 import coinsList from "../../../../coins-list-sorted.json";
 import { fetchRates } from "../../../../API/API-calls";
-export default function AddCoin({
-  balance,
-  onUpdateBalance,
-  selectedCurrency,
-}) {
+import CurrencyContext from "../../../../store/currency-context";
+
+export default function AddCoin({ balance, onUpdateBalance }) {
   const balanceData = balance;
   const inputRef = useRef(null);
   const [searchInput, setSearchInput] = useState("");
@@ -17,6 +22,7 @@ export default function AddCoin({
   // the temporary list of coins matching search
   const [resultSearch, setResultSearch] = useState([]);
   const [selectedCoin, setSelectedCoin] = useState({ id: "", amount: 0 });
+  const currencyCtx = useContext(CurrencyContext);
 
   //format currency: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number/toLocaleString
   const formatCurrency = (value, inputCurrency) => {
@@ -67,11 +73,12 @@ export default function AddCoin({
   useEffect(() => {
     async function getRates() {
       let currentRate = 1;
-      const response = await fetchRates([selectedCoin.id], selectedCurrency);
+      const response = await fetchRates([selectedCoin.id], currencyCtx);
       //ex. {"cardano": {"usd": 1.31 }}
       // TODO add error message
       if (response.status >= 200 && response.status <= 299) {
-        currentRate = await response[selectedCoin.id][selectedCurrency];
+        const formattedResponse = await response.json();
+        currentRate = await formattedResponse[selectedCoin.id][currencyCtx];
       }
       inputCoin(+currentRate, "rate");
     }
@@ -79,7 +86,7 @@ export default function AddCoin({
     if (selectedCoin.id) {
       getRates();
     }
-  }, [selectedCoin.id, selectedCurrency]);
+  }, [selectedCoin.id, currencyCtx]);
 
   function toggleAddCoin() {
     setAddCoinInputDisplayed((prevState) => !prevState);

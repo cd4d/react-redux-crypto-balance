@@ -1,20 +1,22 @@
 import {
-  React
+  React,useContext
 } from "react";
 import { DataTable } from "primereact/datatable";
 import { Column } from "primereact/column";
 import { Button } from "primereact/button";
 import AddCoin from "./add-coin/addCoin";
 import { formatCurrency } from "../../../utils/utils";
+import  CurrencyContext  from "../../../store/currency-context";
+
 import "./balance-list.css";
 export default function BalanceList({
   balance,
   onUpdateBalance,
-  selectedCurrency,
   isBalanceLoading,
   error
 }) {
   const pageSize = 5;
+  const currencyCtx =  useContext(CurrencyContext)
 
   // editing amount
   const onEditorAmountChange = (tableProps, event) => {
@@ -46,6 +48,10 @@ export default function BalanceList({
     );
   }
 
+  function onRefreshRates(){
+
+  }
+
   return (
     <>
       <h3>Balance List</h3>
@@ -58,13 +64,19 @@ export default function BalanceList({
 
 
       {!isBalanceLoading &&
-
+        <>
         <AddCoin
           balance={balance}
           onUpdateBalance={onUpdateBalance}
-          selectedCurrency={selectedCurrency}
         />
-      }  {/* Alert message if fetching rates unsuccessful  */}
+         <Button
+            icon="pi pi-refresh"
+            className="p-button-sm"
+            onClick={onRefreshRates}
+          ></Button>
+          </>
+      }  
+      {/* Alert message if fetching rates unsuccessful  */}
       {error && <div className="alert alert-danger">Error fetching rates. Using default rates instead.</div>}
       {!isBalanceLoading &&
         <div>
@@ -86,7 +98,7 @@ export default function BalanceList({
                 body={(coin) =>
                   formatCurrency(
                     coin.rate,
-                    selectedCurrency ? selectedCurrency : "usd"
+                    currencyCtx ? currencyCtx : "usd"
                   )
                 }
                 sortable
@@ -105,7 +117,7 @@ export default function BalanceList({
                 body={(coin) =>
                   formatCurrency(
                     coin.value,
-                    selectedCurrency ? selectedCurrency : "usd"
+                    currencyCtx ? currencyCtx : "usd"
                   )
                 }
               ></Column>

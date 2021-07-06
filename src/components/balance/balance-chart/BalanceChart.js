@@ -1,6 +1,7 @@
-import { React, useState, useEffect } from "react";
+import { React, useState, useEffect,useContext } from "react";
 import { Chart } from "primereact/chart";
 import { formatCurrency } from "../../../utils/utils";
+import  CurrencyContext  from "../../../store/currency-context";
 
 export default function BalanceChart(props) {
   const initialChartData = {
@@ -14,6 +15,8 @@ export default function BalanceChart(props) {
     ],
   };
   const [formattedData, setFormattedData] = useState(initialChartData);
+  const currencyCtx =  useContext(CurrencyContext)
+
   //const [isChartLoading, setIsChartLoading] = useState(false);
   //console.log(props);
 
@@ -61,7 +64,7 @@ export default function BalanceChart(props) {
       )} */}
 
       <div className="">
-        <h4>Total: {formatCurrency(props.total, props.selectedCurrency)}</h4>
+        <h4>Total: {formatCurrency(props.total, currencyCtx)}</h4>
         <Chart
           type="doughnut"
           data={formattedData}

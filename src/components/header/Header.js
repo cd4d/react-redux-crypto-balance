@@ -1,5 +1,4 @@
-import { React } from "react";
-
+import React from "react";
 export default function Header(props) {
   const CURRENCIES_LIST = [
     "usd",
@@ -22,7 +21,7 @@ export default function Header(props) {
         <div className="container-fluid">
           <div className="navbar-header">
             <a href="#top" className="navbar-brand">
-              Crypto Balance React
+              Crypto Balance React: 
             </a>
           </div>
           <div className="col-md-3">
