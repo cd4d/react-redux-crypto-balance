@@ -43,5 +43,8 @@
   "devDependencies": {
     "canvas": "^2.8.0",
     "eslint-plugin-react-hooks": "^4.2.0"
+  },
+  "optionalDependencies": {
+    "fsevents": "^2.3.2"
   }
 }
