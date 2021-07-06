@@ -1,6 +1,6 @@
 import { React, useState } from "react";
 import { Paginator } from "primereact/paginator";
-import { Button } from 'primereact/button';
+import { Button } from "primereact/button";
 import { fetchNews } from "../../../API/API-calls";
 import newsSample from "../../../news-sample.json";
 export default function BalanceNews(props) {
@@ -15,22 +15,24 @@ export default function BalanceNews(props) {
   let coinsList = currentBalance.map((coin) => coin.name);
 
   async function refreshNews() {
-    setIsNewsLoading(true)
+    setIsNewsLoading(true);
     if (coinsList) {
-      const response = await fetchNews(coinsList);
-      // https://learnwithparam.com/blog/how-to-handle-fetch-errors/
-      if (response) {
-        setNewsData(response);
-      } else {
-        setNewsData(newsSample)
-        console.log("error: ", response);
-        setError("Error fetching news.")
+      try {
+        const response = await fetchNews(coinsList);
+        if (response.error) {
+          throw new Error(error.errorData.message);
+        }
+        setNewsData(await response.json());
+      } catch (error) {
+        console.log("error: ", error);
+        setError("Error fetching news.");
       }
-      setIsNewsLoading(false)
+
+      setIsNewsLoading(false);
     }
   }
   function onCloseError() {
-    setError(null)
+    setError(null);
   }
   function paginate(e) {
     setIndexFirstNews(e.page * newsPerPage + 1);
@@ -66,23 +68,24 @@ export default function BalanceNews(props) {
           </button>
         </div>
       )}
-      {(!isNewsLoading && !error) && (<div>
-        {newsData.value
-          .slice(indexFirstNews, indexLastNews)
-          .map((element, idx) => (
-            <div key={idx} className="list-group">
-              <a href={element.url}>{element.title}</a>
-              <p className="news-description">{ }</p>
-            </div>
-          ))}
-        <Paginator
-          first={indexFirstNews}
-          rows={newsPerPage}
-          totalRecords={newsData.value.length}
-          onPageChange={paginate}
-        ></Paginator>
-      </div>)}
-
+      {!isNewsLoading && !error && (
+        <div>
+          {newsData.value
+            .slice(indexFirstNews, indexLastNews)
+            .map((element, idx) => (
+              <div key={idx} className="list-group">
+                <a href={element.url}>{element.title}</a>
+                <p className="news-description">{}</p>
+              </div>
+            ))}
+          <Paginator
+            first={indexFirstNews}
+            rows={newsPerPage}
+            totalRecords={newsData.value.length}
+            onPageChange={paginate}
+          ></Paginator>
+        </div>
+      )}
     </>
   );
 }

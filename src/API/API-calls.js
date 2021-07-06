@@ -38,13 +38,14 @@ export async function fetchNews(coinsList) {
     });
     if (!response.ok) {
       const message = `An error has occured: ${response.status}`;
+      console.log(message);
       throw new Error(message);
     }
-    if (response) {
-      const news = await response.json();
-      return news;
+    if (response.status >= 200 && response.status <= 299) {
+      return response;
     }
   } catch (error) {
-    return error;
+    console.log(error);
+    return { error: true, errorData: error };
   }
 }
