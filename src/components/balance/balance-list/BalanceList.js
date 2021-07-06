@@ -1,6 +1,4 @@
-import {
-  React, useContext, useEffect, useState, useRef
-} from "react";
+import { React, useContext } from "react";
 import { DataTable } from "primereact/datatable";
 import { Column } from "primereact/column";
 import { Button } from "primereact/button";
@@ -14,15 +12,12 @@ export default function BalanceList({
   onUpdateBalance,
   isBalanceLoading,
   error,
-  isUpdated
+  isUpdated,
 }) {
   const pageSize = 5;
-  const currencyCtx = useContext(CurrencyContext)
+  const currencyCtx = useContext(CurrencyContext);
   // const [balanceData, setBalanceData] = useState(balance)
   // useEffect(() => { setBalanceData(balance) })
-
-
-
 
   // editing amount
   const onEditorAmountChange = (tableProps, event) => {
@@ -39,11 +34,9 @@ export default function BalanceList({
         onChange={(event) => onEditorAmountChange(tableProps, event)}
         min={0}
         className="amount-input"
-
       />
     );
   };
-
 
   function onDeleteCoin(coin) {
     const updatedBalance = balance.filter((el) => el.id !== coin.id);
@@ -56,8 +49,6 @@ export default function BalanceList({
     );
   }
 
-
-
   return (
     <>
       <h3>Balance List</h3>
@@ -68,22 +59,22 @@ export default function BalanceList({
         </div>
       )}
 
-
-      {!isBalanceLoading &&
+      {!isBalanceLoading && (
         <>
-          <AddCoin
-            balance={balance}
-            onUpdateBalance={onUpdateBalance}
-          />
+          <AddCoin balance={balance} onUpdateBalance={onUpdateBalance} />
           <Button
             icon="pi pi-refresh"
             className="p-button-sm"
-          //onClick={onRefreshRates}
+            //onClick={onRefreshRates}
           ></Button>
         </>
-      }
+      )}
       {/* Alert message if fetching rates unsuccessful  */}
-      {error && <div className="alert alert-danger">Error fetching rates. Using default rates instead.</div>}
+      {error && (
+        <div className="alert alert-danger">
+          Error fetching rates. Using default rates instead.
+        </div>
+      )}
 
       <div>
         <div className="card">
@@ -99,15 +90,17 @@ export default function BalanceList({
             className="balance-list-table"
           >
             <Column field="name" header="Name" sortable></Column>
-            <Column field="symbol" header="Symbol" sortable className="d-none d-sm-none d-lg-table-cell"></Column>
+            <Column
+              field="symbol"
+              header="Symbol"
+              sortable
+              className="d-none d-sm-none d-lg-table-cell"
+            ></Column>
             <Column
               field="rate"
               header="Rate"
               body={(coin) =>
-                formatCurrency(
-                  coin.rate,
-                  currencyCtx ? currencyCtx : "usd"
-                )
+                formatCurrency(coin.rate, currencyCtx ? currencyCtx : "usd")
               }
               sortable
               className={error ? "table-text-error" : ""}
@@ -123,10 +116,7 @@ export default function BalanceList({
               header="Value"
               sortable
               body={(coin) =>
-                formatCurrency(
-                  coin.value,
-                  currencyCtx ? currencyCtx : "usd"
-                )
+                formatCurrency(coin.value, currencyCtx ? currencyCtx : "usd")
               }
             ></Column>
             <Column
@@ -136,9 +126,6 @@ export default function BalanceList({
           </DataTable>
         </div>
       </div>
-
-
-
     </>
   );
 }
