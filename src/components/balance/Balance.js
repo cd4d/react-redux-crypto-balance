@@ -1,9 +1,9 @@
-import { React, useState, useRef, useCallback, useEffect,useContext } from "react";
+import { React, useState, useRef, useCallback, useEffect, useContext } from "react";
 import BalanceList from "./balance-list/BalanceList";
 import BalanceNews from "./balance-news/BalanceNews";
 import BalanceChart from "./balance-chart/BalanceChart";
 import { fetchRates } from "../../API/API-calls";
-import  CurrencyContext  from "../../store/currency-context";
+import CurrencyContext from "../../store/currency-context";
 
 export default function Balance() {
   const DEFAULT_BALANCE = [
@@ -25,13 +25,13 @@ export default function Balance() {
       subUnit: "GWei",
       subUnitToUnit: 1000000000,
     },
-    {
-      name: "Tether",
-      id: "tether",
-      symbol: "USDT",
-      rate: 1,
-      amount: 3000,
-    },
+    // {
+    //   name: "Tether",
+    //   id: "tether",
+    //   symbol: "USDT",
+    //   rate: 1,
+    //   amount: 3000,
+    // },
 
     // {
     //   name: "Dogecoin",
@@ -105,7 +105,7 @@ export default function Balance() {
                 //console.log(key);
                 coin.rate =
                   formattedResponse[key][
-                    currencyCtx ? currencyCtx : "usd"
+                  currencyCtx ? currencyCtx : "usd"
                   ];
                 break;
               }
@@ -129,19 +129,16 @@ export default function Balance() {
   const triggerUpdate = () => {
     setIsUpdated((prevState) => !prevState);
   };
-  const updateBalance = useCallback(
-    async (newBalance) => {
-      setIsBalanceLoading(true);
-      const tempBalance = calculateBalance(newBalance);
-      if (tempBalance) {
-        setIsBalanceLoading(false);
-        // console.log(tempBalance);
-        setBalance(tempBalance);
-        setIsUpdated((prevState) => !prevState);
-      }
-    },
-    [calculateBalance]
-  );
+  const updateBalance = (newBalance) => {
+    setIsBalanceLoading(true);
+    const tempBalance = calculateBalance(newBalance);
+    if (tempBalance) {
+      // console.log(tempBalance);
+      setBalance(tempBalance);
+      setIsBalanceLoading(false);
+      setIsUpdated((prevState) => !prevState);
+    }
+  }
 
   return (
     <div className="container">
@@ -150,12 +147,10 @@ export default function Balance() {
           <BalanceList
             balance={balance}
             total={total}
-            onUpdateBalance={useCallback(
-              (newBalance) => {
-                updateBalance(newBalance);
-              },
-              [updateBalance]
-            )}
+            onUpdateBalance={
+              (newBalance) =>
+                updateBalance(newBalance)
+            }
             isBalanceLoading={isBalanceLoading}
             error={error}
             isUpdated={isUpdated}

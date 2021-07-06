@@ -15,7 +15,6 @@ import { fetchRates } from "../../../../API/API-calls";
 import CurrencyContext from "../../../../store/currency-context";
 
 export default function AddCoin({ balance, onUpdateBalance }) {
-  const balanceData = balance;
   const inputRef = useRef(null);
   const [searchInput, setSearchInput] = useState("");
   const [addCoinInputDisplayed, setAddCoinInputDisplayed] = useState(false);
@@ -94,7 +93,7 @@ export default function AddCoin({ balance, onUpdateBalance }) {
   function onAddCoin(coin) {
     if (coin && coin.id && coin.amount) {
       console.log("sending coin: ", coin);
-      const updatedBalance = balanceData;
+      const updatedBalance = balance;
       updatedBalance.push(coin);
       console.log("updating balance: ", updatedBalance);
       onUpdateBalance(updatedBalance);
