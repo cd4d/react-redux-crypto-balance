@@ -70,7 +70,6 @@ export default function Balance() {
   const currencyCtx = useContext(CurrencyContext);
   // useRef hook to avoid updating total in a loop with useState
   const total = useRef(0);
-  //const tempBalance = useRef(balance);
 
   const calculateBalance = useCallback((currentBalance) => {
     total.current = 0;
@@ -110,7 +109,6 @@ export default function Balance() {
             for (let i = 0; i < responseKeys.length; i++) {
               let key = responseKeys[i];
               if (key === coin.name.toLowerCase()) {
-                //console.log(key);
                 coin.rate =
                   formattedResponse[key][currencyCtx ? currencyCtx : "usd"];
                 break;
@@ -130,6 +128,7 @@ export default function Balance() {
       setBalance(useEffectBalance);
     };
     fetchData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [calculateBalance, currencyCtx, ratesUpdated]);
 
   const triggerChartUpdate = () => {
@@ -144,7 +143,6 @@ export default function Balance() {
     setIsBalanceLoading(true);
     const tempBalance = calculateBalance(newBalance);
     if (tempBalance) {
-      // console.log(tempBalance);
       setBalance(tempBalance);
       setIsBalanceLoading(false);
     }
