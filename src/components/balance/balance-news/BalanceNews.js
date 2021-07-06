@@ -19,11 +19,11 @@ export default function BalanceNews(props) {
     if (coinsList) {
       const response = await fetchNews(coinsList);
       // https://learnwithparam.com/blog/how-to-handle-fetch-errors/
-      if (response.status >= 200 && response.status <= 299) {
+      if (response) {
         setNewsData(response);
       } else {
         setNewsData(newsSample)
-        console.log("error");
+        console.log("error: ", response);
         setError("Error fetching news.")
       }
       setIsNewsLoading(false)
