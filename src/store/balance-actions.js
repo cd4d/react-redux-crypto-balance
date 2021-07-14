@@ -20,3 +20,4 @@ export const fetchRatesAction = createAsyncThunk(
     return { rates: data, currency:action.currency };
   }
 );
+

@@ -11,9 +11,7 @@ import { useSelector, useDispatch } from "react-redux";
 import { fetchRatesAction } from "../../../store/balance-actions";
 
 export default function BalanceList({
-  onUpdateBalance,
-  
-  triggerRatesUpdate,
+  onUpdateBalance
 }) {
   const pageSize = 5;
   const currencyCtx = useContext(CurrencyContext);
@@ -57,6 +55,7 @@ export default function BalanceList({
       <Button onClick={() => onDeleteCoin(coinClicked)} icon="pi pi-times" />
     );
   }
+  
 
   return (
     <>

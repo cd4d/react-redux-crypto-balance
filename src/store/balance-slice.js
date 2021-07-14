@@ -1,6 +1,15 @@
 import { createSlice } from "@reduxjs/toolkit";
 import { fetchRatesAction } from "./balance-actions";
-
+const initialChartData = {
+  labels: ["a", "b", "c"],
+  datasets: [
+    {
+      data: ["1000", "2000", "3000"],
+      backgroundColor: ["#42A5F5", "#66BB6A", "#FFA726"],
+      hoverBackgroundColor: ["#64B5F6", "#81C784", "#FFB74D"],
+    },
+  ],
+};
 const initialBalance = {
   isChanged: false,
   total: 0,
@@ -34,7 +43,7 @@ const initialBalance = {
       value: 0,
     },
   ],
-  formattedData:[]
+  formattedData: initialChartData,
 };
 const balanceSlice = createSlice({
   name: "balance",
@@ -44,7 +53,7 @@ const balanceSlice = createSlice({
       state.balance = action.payload;
     },
     calculateBalance(state, action) {
-      console.log(state.balance);
+      //console.log(state.balance);
       state.total = 0;
       state.balance.map((coin) => {
         //console.log(coin);
@@ -63,6 +72,16 @@ const balanceSlice = createSlice({
         return coin;
       });
     },
+    formatData(state) {
+      let tempData = { coinNames: [], coinValues: [] };
+      state.balance.map((coin) => {
+        tempData.coinNames.push(coin.name);
+        tempData.coinValues.push(coin.value);
+        return coin;
+      });
+      state.formattedData.labels = tempData.coinNames;
+      state.formattedData.datasets[0].data = tempData.coinValues;
+    },
   },
   extraReducers: {
     [fetchRatesAction.fulfilled]: (state, action) => {
@@ -75,14 +94,15 @@ const balanceSlice = createSlice({
           let key = responseKeys[i];
           if (key === coin.name.toLowerCase()) {
             coin.rate =
-              formattedResponse[key][action.payload.currency ? action.payload.currency : "usd"];
+              formattedResponse[key][
+                action.payload.currency ? action.payload.currency : "usd"
+              ];
             break;
           }
         }
         return coin;
       });
     },
-
   },
 });
 
