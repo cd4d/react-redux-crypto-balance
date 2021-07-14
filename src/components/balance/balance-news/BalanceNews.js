@@ -3,6 +3,8 @@ import { Paginator } from "primereact/paginator";
 import { Button } from "primereact/button";
 import { fetchNews } from "../../../API/API-calls";
 import newsSample from "../../../news-sample.json";
+import { useSelector, useDispatch } from "react-redux";
+import {  } from "../../../store/news-slice";
 export default function BalanceNews(props) {
   const newsPerPage = 5;
   const [error, setError] = useState(null);
@@ -13,21 +15,21 @@ export default function BalanceNews(props) {
 
   let currentBalance = props.balance;
   let coinsList = currentBalance.map((coin) => coin.name);
-
+const dispatch = useDispatch()
   async function refreshNews() {
     setIsNewsLoading(true);
     if (coinsList) {
-      try {
-        const response = await fetchNews(coinsList);
-        if (response.error) {
-          throw new Error(error.errorData.message);
-        }
-        setNewsData(await response.json());
-      } catch (error) {
-        console.log("error: ", error);
-        setError("Error fetching news.");
-      }
-
+      // try {
+      //   const response = await fetchNews(coinsList);
+      //   if (response.error) {
+      //     throw new Error(error.errorData.message);
+      //   }
+      //   setNewsData(await response.json());
+      // } catch (error) {
+      //   console.log("error: ", error);
+      //   setError("Error fetching news.");
+      // }
+      dispatch()
       setIsNewsLoading(false);
     }
   }

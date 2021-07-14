@@ -3,13 +3,13 @@ import { fetchRatesAction } from "./balance-actions";
 
 const uiSlice = createSlice({
   name: "uiSlice",
-  initialState: { error: null, isLoading: false, addCoinDisplayed: false },
+  initialState: { errors: { rates: null, news: null }, isLoading: { rates: false, news: false }, addCoinDisplayed: false },
   reducers: {
     changeIsLoading(state, action) {
-      state.isLoading = action.payload;
+      state.isLoading[action.payload.type] = action.payload.value;
     },
     changeError(state, action) {
-      state.error = action.payload;
+      state.error[action.payload.type] = action.payload.value;
     },
     toggleAddCoinDisplayed(state) {
       state.addCoinDisplayed = !state.addCoinDisplayed;
@@ -17,16 +17,16 @@ const uiSlice = createSlice({
   },
   extraReducers: {
     [fetchRatesAction.pending]: (state) => {
-      state.error = null;
-      state.isLoading = true;
+      state.error.rates = null;
+      state.isLoading.rates = true;
     },
     [fetchRatesAction.fulfilled]: (state) => {
-      state.error = null;
-      state.isLoading = false;
+      state.error.rates = null;
+      state.isLoading.rates = false;
     },
     [fetchRatesAction.rejected]: (state) => {
-      state.isLoading = false;
-      state.error = "Error fetching rates.";
+      state.isLoading.rates = false;
+      state.error.rates = "Error fetching rates.";
     },
   },
 });

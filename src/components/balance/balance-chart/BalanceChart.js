@@ -8,7 +8,7 @@ export default function BalanceChart() {
   const dispatch = useDispatch();
   const balance = useSelector((state) => state.balanceReducer.balance);
   const total = useSelector((state) => state.balanceReducer.total);
-  const isBalanceLoading = useSelector((state) => state.uiReducer.isLoading);
+  const isBalanceLoading = useSelector((state) => state.uiReducer.isLoading.rates);
   const formattedData = useSelector(
     (state) => state.balanceReducer.formattedData
   );

@@ -16,8 +16,8 @@ export default function BalanceList({
 }) {
   const pageSize = 5;
   const currencyCtx = useContext(CurrencyContext);
-  const isBalanceLoading = useSelector((state) => state.uiReducer.isLoading);
-  const error = useSelector((state) => state.uiReducer.error);
+  const isBalanceLoading = useSelector((state) => state.uiReducer.isLoading.rates);
+  const error = useSelector((state) => state.uiReducer.error.rates);
   const balance = useSelector((state) => state.balanceReducer.balance);
   const addCoinInputDisplayed = useSelector(
     (state) => state.uiReducer.addCoinDisplayed

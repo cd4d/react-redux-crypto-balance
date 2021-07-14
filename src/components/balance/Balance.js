@@ -15,7 +15,7 @@ export default function Balance() {
   const dispatch = useDispatch();
   const coinsList = balance.map((coin) => coin.name);
   console.log(balance);
-const balanceTotal = useSelector(state => state.balanceReducer.total)
+
   useEffect(() => {
     dispatch(balanceActions.calculateBalance());
   }, [dispatch]);
@@ -40,7 +40,6 @@ const balanceTotal = useSelector(state => state.balanceReducer.total)
     <div className="container">
       <div className="row">
         <div className="col-md-7 col-sm-12">
-          <h4>{balanceTotal}</h4>
           <BalanceList
             onUpdateBalance={(newBalance) => updateBalance(newBalance)}
           ></BalanceList>
