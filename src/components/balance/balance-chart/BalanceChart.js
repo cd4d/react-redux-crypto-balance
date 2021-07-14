@@ -2,8 +2,12 @@ import { React, useState, useEffect,useContext } from "react";
 import { Chart } from "primereact/chart";
 import { formatCurrency } from "../../../utils/utils";
 import  CurrencyContext  from "../../../store/currency-context";
+import { useSelector } from "react-redux";
+export default function BalanceChart() {
+  const balance = useSelector((state) => state.balanceReducer.balance);
+  const total = useSelector((state) => state.balanceReducer.total);
 
-export default function BalanceChart(props) {
+  const isBalanceLoading = useSelector((state) => state.uiReducer.isLoading);
   const initialChartData = {
     labels: ["a", "b", "c"],
     datasets: [
@@ -17,14 +21,13 @@ export default function BalanceChart(props) {
   const [formattedData, setFormattedData] = useState(initialChartData);
   const currencyCtx =  useContext(CurrencyContext)
 
-  //const [isChartLoading, setIsChartLoading] = useState(false);
-  //console.log(props);
+
 
   useEffect(() => {
     function formatData() {
 
       let tempData = { coinNames: [], coinValues: [] };
-      props.balance.map((coin) => {
+      balance.map((coin) => {
         tempData.coinNames.push(coin.name);
         tempData.coinValues.push(coin.value);
         return coin;
@@ -40,8 +43,7 @@ export default function BalanceChart(props) {
       }));
     }
     formatData();
-  }, [props.balance,
-  props.isUpdated
+  }, [balance
   ]);
 
   const chartOptions = {
@@ -64,12 +66,12 @@ export default function BalanceChart(props) {
       )} */}
 
       <div className="">
-        <h4>Total: {formatCurrency(props.total, currencyCtx)}</h4>
+        <h4>Total: {formatCurrency(total, currencyCtx)}</h4>
         <Chart
           type="doughnut"
           data={formattedData}
           options={chartOptions}
-          style={props.isBalanceLoading ? { display: "none" } : {}}
+          style={isBalanceLoading ? { display: "none" } : {}}
 
         // style={{ minWidth:"20vw",maxWidth:"23vw"}}
         // style={{position: "relative", height:"45vh", width:"23vw"}}

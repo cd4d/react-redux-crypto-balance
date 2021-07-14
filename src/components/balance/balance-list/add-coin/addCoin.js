@@ -1,25 +1,22 @@
-import {
-  React,
-  useEffect,
-  useRef,
-  useState,
-  useCallback,
-  useContext,
-} from "react";
+import { React, useEffect, useRef, useCallback, useContext } from "react";
 import { InputText } from "primereact/inputtext";
 
 // coins list for adding coin search function
 import coinsList from "../../../../coins-list-sorted.json";
 import { fetchRates } from "../../../../API/API-calls";
 import CurrencyContext from "../../../../store/currency-context";
-
-export default function AddCoin({ balance, onUpdateBalance,addCoinInputDisplayed,setAddCoinInputDisplayed }) {
+import { useSelector, useDispatch } from "react-redux";
+import { addCoinActions } from "../../../../store/addCoin-slice";
+import { uiActions } from "../../../../store/ui-slice";
+export default function AddCoin({
+  balance,
+  onUpdateBalance
+}) {
+  const dispatch = useDispatch();
   const inputRef = useRef(null);
-  const [searchInput, setSearchInput] = useState("");
-  // the temporary list of coins matching search
-  const [resultSearch, setResultSearch] = useState([]);
-  const [selectedCoin, setSelectedCoin] = useState({ id: "", amount: 0 });
   const currencyCtx = useContext(CurrencyContext);
+  const addCoinState = useSelector((state) => state.addCoinReducer);
+  const addCoinInputDisplayed = useSelector((state) => state.uiReducer.addCoinDisplayed);
 
   //format currency: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number/toLocaleString
   const formatCurrency = (value, inputCurrency) => {
@@ -48,45 +45,98 @@ export default function AddCoin({ balance, onUpdateBalance,addCoinInputDisplayed
       }
       return null;
     });
-    console.log(result);
     return result;
   }, []);
+  const inputCoin = useCallback(
+    (input, property) => {
+      // convert id to lowercase and update input field
+      if (property === "id") {
+        // filling the input with selected value using ref so debounce hook not triggered
+        inputRef.current.value = input.id;
+        // setSelectedCoin(input);
+        dispatch(
+          addCoinActions.setStateReducer({
+            type: "replaceState",
+            field: "selectedCoin",
+            data: input,
+          })
+        );
+
+        // empty result array
+        // setResultSearch([]);
+        dispatch(
+          addCoinActions.setStateReducer({
+            type: "replaceState",
+            field: "resultSearch",
+            data: [],
+          })
+        );
+      } else {
+        // setSelectedCoin((prevState) => ({
+        //   ...prevState,
+        //   [property]: input,
+        // }));
+        dispatch(
+          addCoinActions.setStateReducer({
+            type: "replaceProperty",
+            field: "selectedCoin",
+            property: property,
+            data: input,
+          })
+        );
+      }
+    },
+    [dispatch]
+  );
 
   // searching coin name from local coin list
   // debounce hook
   useEffect(() => {
     const timer = setTimeout(() => {
       // executes search function only every 500ms
-      const results = searchCoin(searchInput);
-      setResultSearch(results);
+      const results = searchCoin(addCoinState.searchInput);
+      // setResultSearch(results);
+      dispatch(
+        addCoinActions.setStateReducer({
+          type: "replaceState",
+          field: "resultSearch",
+          data: results,
+        })
+      );
     }, 500);
     return () => {
       // resets the timer, only last timer active (debouncing)
       clearTimeout(timer);
     };
-  }, [searchInput, searchCoin]);
+  }, [addCoinState.searchInput, dispatch, searchCoin]);
 
   // fetching rate of new coin
   useEffect(() => {
     async function getRates() {
       let currentRate = 1;
-      const response = await fetchRates([selectedCoin.id], currencyCtx);
+      const response = await fetchRates(
+        [addCoinState.selectedCoin.id],
+        currencyCtx
+      );
       //ex. {"cardano": {"usd": 1.31 }}
       // TODO add error message
       if (response.status >= 200 && response.status <= 299) {
         const formattedResponse = await response.json();
-        currentRate = await formattedResponse[selectedCoin.id][currencyCtx];
+        console.log(formattedResponse);
+        currentRate = await formattedResponse[addCoinState.selectedCoin.id][
+          currencyCtx
+        ];
       }
       inputCoin(+currentRate, "rate");
     }
     // prevents launching at first render
-    if (selectedCoin.id) {
+    if (addCoinState.selectedCoin.id) {
       getRates();
     }
-  }, [selectedCoin.id, currencyCtx]);
+  }, [addCoinState.selectedCoin.id, currencyCtx, inputCoin]);
 
   function toggleAddCoin() {
-    setAddCoinInputDisplayed((prevState) => !prevState);
+    dispatch(uiActions.toggleAddCoinDisplayed())
   }
 
   function addCoin(coin) {
@@ -100,28 +150,34 @@ export default function AddCoin({ balance, onUpdateBalance,addCoinInputDisplayed
   }
 
   function setSearchCoin(e) {
-    setSearchInput(e);
+    //setSearchInput(e);
+    dispatch(
+      addCoinActions.setStateReducer({
+        type: "replaceState",
+        field: "searchInput",
+        data: e,
+      })
+    );
   }
   function closeInput() {
-    setSearchInput("");
-    setSelectedCoin({ id: "", amount: 0 });
-    toggleAddCoin();
-  }
+    //setSearchInput("");
+    dispatch(
+      addCoinActions.setStateReducer({
+        type: "replaceState",
+        field: "searchInput",
+        data:"",
+      })
+    );
+    // setSelectedCoin({ id: "", amount: 0 });
+    dispatch(
+      addCoinActions.setStateReducer({
+        type: "replaceState",
+        field: "selectedCoin",
+        data: { id: "", amount: 0 },
+      })
+    );
 
-  function inputCoin(input, property) {
-    // convert id to lowercase and update input field
-    if (property === "id") {
-      // filling the input with selected value using ref so debounce hook not triggered
-      inputRef.current.value = input.id;
-      setSelectedCoin(input);
-      // empty result array
-      setResultSearch([]);
-    } else {
-      setSelectedCoin((prevState) => ({
-        ...prevState,
-        [property]: input,
-      }));
-    }
+    toggleAddCoin();
   }
 
   return (
@@ -129,10 +185,13 @@ export default function AddCoin({ balance, onUpdateBalance,addCoinInputDisplayed
       {addCoinInputDisplayed ? (
         <div className="row mt-2 mb-2">
           <h6>
-            Add coin: {selectedCoin.name}{" "}
-            {selectedCoin.amount > 0 &&
-              selectedCoin.rate &&
-              formatCurrency(selectedCoin.rate * +selectedCoin.amount)}
+            Add coin: {addCoinState.selectedCoin.name}{" "}
+            {addCoinState.selectedCoin.amount > 0 &&
+              addCoinState.selectedCoin.rate &&
+              formatCurrency(
+                addCoinState.selectedCoin.rate *
+                  +addCoinState.selectedCoin.amount
+              )}
           </h6>
           <div className="col">
             <div>
@@ -146,28 +205,29 @@ export default function AddCoin({ balance, onUpdateBalance,addCoinInputDisplayed
                 }}
               />
               {/* List of matching coins */}
-              {resultSearch && resultSearch.length > 0 && (
-                <ul className="list-group">
-                  {resultSearch.map((coin, idx) => (
-                    <li
-                      key={idx}
-                      className="list-group-item list-group-item-action"
-                    >
-                      {/* omitting arrow notation causes render bug */}
-                      <span onClick={() => inputCoin(coin, "id")}>
-                        {coin.id}
-                      </span>
-                    </li>
-                  ))}
-                </ul>
-              )}
+              {addCoinState.resultSearch &&
+                addCoinState.resultSearch.length > 0 && (
+                  <ul className="list-group">
+                    {addCoinState.resultSearch.map((coin, idx) => (
+                      <li
+                        key={idx}
+                        className="list-group-item list-group-item-action"
+                      >
+                        {/* omitting arrow notation causes render bug */}
+                        <span onClick={() => inputCoin(coin, "id")}>
+                          {coin.id}
+                        </span>
+                      </li>
+                    ))}
+                  </ul>
+                )}
             </div>
           </div>
           {/* Input amount of coin, disabled if no coin selected */}
           <div className="col ps-0">
             <div>
               <InputText
-                disabled={!selectedCoin.id}
+                disabled={!addCoinState.selectedCoin.id}
                 type="number"
                 min={0}
                 id="add-coin-input-amount"
@@ -179,10 +239,10 @@ export default function AddCoin({ balance, onUpdateBalance,addCoinInputDisplayed
 
           <div className="col pt-2">
             {/* confirm and add coin */}
-            {selectedCoin.id && selectedCoin.amount && (
+            {addCoinState.selectedCoin.id && addCoinState.selectedCoin.amount && (
               <span
                 style={{ cursor: "pointer" }}
-                onClick={() => addCoin(selectedCoin)}
+                onClick={() => addCoin(addCoinState.selectedCoin)}
               >
                 <span className="pi pi-check"></span>
               </span>
@@ -199,8 +259,10 @@ export default function AddCoin({ balance, onUpdateBalance,addCoinInputDisplayed
           onClick={toggleAddCoin}
           type="button"
           className="btn btn-primary mt-1 mb-2 btn-sm"
-        ><i className="pi pi-plus" aria-hidden="true"></i>
-            <span className="d-sm-none d-lg-inline"> Add coin</span></button>
+        >
+          <i className="pi pi-plus" aria-hidden="true"></i>
+          <span className="d-sm-none d-lg-inline"> Add coin</span>
+        </button>
       )}
     </>
   );

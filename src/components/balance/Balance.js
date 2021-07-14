@@ -10,59 +10,13 @@ import BalanceList from "./balance-list/BalanceList";
 import BalanceNews from "./balance-news/BalanceNews";
 import BalanceChart from "./balance-chart/BalanceChart";
 import { fetchRates } from "../../API/API-calls";
+import { useSelector, useDispatch } from "react-redux";
 import CurrencyContext from "../../store/currency-context";
-
+import { balanceActions } from "../../store/balance-slice";
+import { uiActions } from "../../store/ui-slice";
+import { fetchRatesAction } from "../../store/balance-actions";
 export default function Balance() {
-  const DEFAULT_BALANCE = [
-    {
-      name: "Bitcoin",
-      id: "bitcoin",
-      symbol: "BTC",
-      rate: 30000,
-      amount: 0.5,
-      subUnit: "Satoshi",
-      subUnitToUnit: 100000000,
-    },
-    {
-      name: "Ethereum",
-      id: "ethereum",
-      symbol: "ETH",
-      rate: 2000,
-      amount: 3,
-      subUnit: "GWei",
-      subUnitToUnit: 1000000000,
-    },
-    {
-      name: "Tether",
-      id: "tether",
-      symbol: "USDT",
-      rate: 1,
-      amount: 3000,
-    },
-
-    // {
-    //   name: "Dogecoin",
-    //   id: "dogecoin",
-    //   symbol: "DOGE",
-    //   rate: 1,
-    //   amount: 4000,
-    // },
-    // {
-    //   name: "Cardano",
-    //   id: "cardano",
-    //   symbol: "ADA",
-    //   rate: 1,
-    //   amount: 150,
-    // },
-    // {
-    //   name: "Ripple",
-    //   id: "ripple",
-    //   symbol: "XRP",
-    //   rate: 1,
-    //   amount: 200,
-    // },
-  ];
-  const [balance, setBalance] = useState(DEFAULT_BALANCE);
+  // const [balance, setBalance] = useState(DEFAULT_BALANCE);
   const [chartUpdated, setChartUpdated] = useState(false);
   const [ratesUpdated, setRatesUpdated] = useState(false);
   const [isBalanceLoading, setIsBalanceLoading] = useState(false);
@@ -70,66 +24,22 @@ export default function Balance() {
   const currencyCtx = useContext(CurrencyContext);
   // useRef hook to avoid updating total in a loop with useState
   const total = useRef(0);
+  /**** REDUX ****/
+  const balance = useSelector((state) => state.balanceReducer.balance);
+  const isLoading = useSelector((state) => state.uiReducer.isLoading);
+  const dispatch = useDispatch();
+  const coinsList = balance.map((coin) => coin.name);
+  console.log(balance);
 
-  const calculateBalance = useCallback((currentBalance) => {
-    total.current = 0;
-    let tempBalance = currentBalance;
-    tempBalance.map((coin) => {
-      if (coin.rate && coin.amount) {
-        coin.value = +coin.rate * +coin.amount;
-      }
-      if (coin.value) {
-        total.current += coin.value;
-      }
-      // get the weight of each
-      if (total && total.current > 0) {
-        if (coin.value) {
-          coin.weight = coin.value / total.current;
-        }
-      }
-      return coin;
-    });
-    triggerChartUpdate();
-    return tempBalance;
-  }, []);
   useEffect(() => {
-    let useEffectBalance = balance;
-    // fetch rates
-    let coinsList = useEffectBalance.map((coin) => coin.id);
-    setIsBalanceLoading(true);
-    setError(null);
-    const fetchData = async () => {
-      try {
-        const response = await fetchRates(coinsList, currencyCtx);
-        let formattedResponse;
-        if (response) {
-          formattedResponse = await response.json();
-          useEffectBalance.map((coin) => {
-            const responseKeys = Object.keys(formattedResponse);
-            for (let i = 0; i < responseKeys.length; i++) {
-              let key = responseKeys[i];
-              if (key === coin.name.toLowerCase()) {
-                coin.rate =
-                  formattedResponse[key][currencyCtx ? currencyCtx : "usd"];
-                break;
-              }
-            }
+    dispatch(balanceActions.calculateBalance());
+  }, [dispatch]);
 
-            return coin;
-          });
-        }
-        setIsBalanceLoading(false);
-      } catch (error) {
-        console.log(error.message);
-        setError(error.message);
-        setIsBalanceLoading(false);
-      }
-      calculateBalance(useEffectBalance);
-      setBalance(useEffectBalance);
-    };
-    fetchData();
+  useEffect(() => {
+    dispatch(fetchRatesAction({ coinsList, currency: currencyCtx }));
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [calculateBalance, currencyCtx, ratesUpdated]);
+  }, [currencyCtx, dispatch]);
+
 
   const triggerChartUpdate = () => {
     setChartUpdated((prevState) => !prevState);
@@ -140,24 +50,26 @@ export default function Balance() {
   };
 
   const updateBalance = (newBalance) => {
-    setIsBalanceLoading(true);
-    const tempBalance = calculateBalance(newBalance);
+    console.log(newBalance);
+    // setIsBalanceLoading(true);
+    dispatch(uiActions.changeIsLoading(true));
+    // const tempBalance = calculateBalance(newBalance);
+    //setBalance(tempBalance);
+    const tempBalance = dispatch(balanceActions.updateBalance(newBalance));
+
     if (tempBalance) {
-      setBalance(tempBalance);
-      setIsBalanceLoading(false);
+      dispatch(balanceActions.calculateBalance());
+      dispatch(uiActions.changeIsLoading(false));
     }
   };
-
+  const balanceTotal = useSelector((state) => state.balanceReducer.total);
   return (
     <div className="container">
       <div className="row">
         <div className="col-md-7 col-sm-12">
+          <h4>{balanceTotal}</h4>
           <BalanceList
-            balance={balance}
-            total={total}
             onUpdateBalance={(newBalance) => updateBalance(newBalance)}
-            isBalanceLoading={isBalanceLoading}
-            error={error}
             triggerRatesUpdate={triggerRatesUpdate}
           ></BalanceList>
         </div>
@@ -170,7 +82,7 @@ export default function Balance() {
             error={error}
           ></BalanceChart>
 
-          <BalanceNews balance={balance}></BalanceNews>
+          {/* <BalanceNews balance={balance}></BalanceNews> */}
         </div>
       </div>
     </div>

@@ -1,4 +1,4 @@
-import { React, useContext, useState } from "react";
+import { React, useContext } from "react";
 import { DataTable } from "primereact/datatable";
 import { Column } from "primereact/column";
 import { Button } from "primereact/button";
@@ -7,17 +7,23 @@ import { formatCurrency } from "../../../utils/utils";
 import CurrencyContext from "../../../store/currency-context";
 
 import "./balance-list.css";
+import { useSelector, useDispatch } from "react-redux";
+import { fetchRatesAction } from "../../../store/balance-actions";
+
 export default function BalanceList({
-  balance,
   onUpdateBalance,
-  isBalanceLoading,
-  error,
+  
   triggerRatesUpdate,
 }) {
   const pageSize = 5;
   const currencyCtx = useContext(CurrencyContext);
-  const [addCoinInputDisplayed, setAddCoinInputDisplayed] = useState(false);
-
+  const isBalanceLoading = useSelector((state) => state.uiReducer.isLoading);
+  const error = useSelector((state) => state.uiReducer.error);
+  const balance = useSelector((state) => state.balanceReducer.balance);
+  const addCoinInputDisplayed = useSelector(
+    (state) => state.uiReducer.addCoinDisplayed
+  );
+  const dispatch = useDispatch();
   // editing amount
   const onEditorAmountChange = (tableProps, event) => {
     let updatedBalance = [...tableProps.value];
@@ -37,7 +43,9 @@ export default function BalanceList({
     );
   };
   function onRefreshRates() {
-    triggerRatesUpdate();
+    // triggerRatesUpdate();
+    const coinsList = balance.map((coin) => coin.name);
+    dispatch(fetchRatesAction({ coinsList, currency: currencyCtx }));
   }
   function onDeleteCoin(coin) {
     const updatedBalance = balance.filter((el) => el.id !== coin.id);
@@ -62,12 +70,7 @@ export default function BalanceList({
 
       {!isBalanceLoading && (
         <>
-          <AddCoin
-            balance={balance}
-            onUpdateBalance={onUpdateBalance}
-            addCoinInputDisplayed={addCoinInputDisplayed}
-            setAddCoinInputDisplayed={setAddCoinInputDisplayed}
-          />
+          <AddCoin balance={balance} onUpdateBalance={onUpdateBalance} />
           {/* Refresh rates button  */}
           {!addCoinInputDisplayed && (
             <button
@@ -88,12 +91,12 @@ export default function BalanceList({
         </div>
       )}
 
-      <div>
+      {  <div>
         <div className="card">
           <DataTable
             lazy={false}
-            loading={isBalanceLoading}
             value={balance}
+            loading={isBalanceLoading}
             autoLayout={false}
             paginator={false}
             rows={pageSize}
@@ -137,7 +140,7 @@ export default function BalanceList({
             ></Column>
           </DataTable>
         </div>
-      </div>
+      </div>}
     </>
   );
 }
