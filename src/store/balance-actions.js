@@ -1,4 +1,6 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
+import { isFulfilled } from '@reduxjs/toolkit'
+
 export const fetchRatesAction = createAsyncThunk(
   "balance/fetchRates",
   async (action) => {
@@ -17,7 +19,16 @@ export const fetchRatesAction = createAsyncThunk(
     }
 
     const data = await response.json();
-    return { rates: data, currency:action.currency };
+
+    return { rates: data, currency: action.currency };
+  }, {
+  condition: (action,{getState,extra}) => {
+    const fetchStatus = isFulfilled(action)
+    console.log(fetchStatus);
+  if ( !action.updateBalanceOnFulfilled) {
+    return false
+  }
+}
   }
 );
 

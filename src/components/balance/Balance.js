@@ -3,9 +3,10 @@ import BalanceList from "./balance-list/BalanceList";
 import BalanceChart from "./balance-chart/BalanceChart";
 import { useSelector, useDispatch } from "react-redux";
 import CurrencyContext from "../../store/currency-context";
-import { balanceActions } from "../../store/balance-slice";
+import { balanceActions,fetchAndCalculate } from "../../store/balance-slice";
 import { uiActions } from "../../store/ui-slice";
-import { fetchRatesAction } from "../../store/balance-actions";
+
+
 export default function Balance() {
   const currencyCtx = useContext(CurrencyContext);
 
@@ -14,14 +15,14 @@ export default function Balance() {
   const dispatch = useDispatch();
   const coinsList = balance.map((coin) => coin.name);
   console.log(balance);
-
+const balanceTotal = useSelector(state => state.balanceReducer.total)
   useEffect(() => {
     dispatch(balanceActions.calculateBalance());
   }, [dispatch]);
 
   useEffect(() => {
-    dispatch(fetchRatesAction({ coinsList, currency: currencyCtx }));
-    dispatch(balanceActions.calculateBalance());
+    dispatch(fetchAndCalculate({ coinsList, currency: currencyCtx,updateBalanceOnFulfilled:true }))
+
     // disabling coinsList check to avoir infinite lop
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currencyCtx, dispatch]);
@@ -39,6 +40,7 @@ export default function Balance() {
     <div className="container">
       <div className="row">
         <div className="col-md-7 col-sm-12">
+          <h4>{balanceTotal}</h4>
           <BalanceList
             onUpdateBalance={(newBalance) => updateBalance(newBalance)}
           ></BalanceList>

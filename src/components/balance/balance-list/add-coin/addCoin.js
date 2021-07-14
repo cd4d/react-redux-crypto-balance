@@ -8,6 +8,7 @@ import CurrencyContext from "../../../../store/currency-context";
 import { useSelector, useDispatch } from "react-redux";
 import { addCoinActions } from "../../../../store/addCoin-slice";
 import { uiActions } from "../../../../store/ui-slice";
+import { fetchRatesAction } from "../../../../store/balance-actions";
 export default function AddCoin({
   balance,
   onUpdateBalance
@@ -114,10 +115,11 @@ export default function AddCoin({
   useEffect(() => {
     async function getRates() {
       let currentRate = 1;
-      const response = await fetchRates(
-        [addCoinState.selectedCoin.id],
-        currencyCtx
-      );
+      // const response = await fetchRates(
+      //   [addCoinState.selectedCoin.id],
+      //   currencyCtx
+      // );
+      const response = await dispatch(fetchRatesAction({coinsList:[addCoinState.selectedCoin.id],currency:currencyCtx,updateBalanceOnFulfilled:false}))
       //ex. {"cardano": {"usd": 1.31 }}
       // TODO add error message
       if (response.status >= 200 && response.status <= 299) {

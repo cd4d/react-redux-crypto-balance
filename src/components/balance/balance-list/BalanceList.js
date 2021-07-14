@@ -8,7 +8,8 @@ import CurrencyContext from "../../../store/currency-context";
 
 import "./balance-list.css";
 import { useSelector, useDispatch } from "react-redux";
-import { fetchRatesAction } from "../../../store/balance-actions";
+
+import { fetchAndCalculate } from "../../../store/balance-slice";
 
 export default function BalanceList({
   onUpdateBalance
@@ -43,7 +44,9 @@ export default function BalanceList({
   function onRefreshRates() {
     // triggerRatesUpdate();
     const coinsList = balance.map((coin) => coin.name);
-    dispatch(fetchRatesAction({ coinsList, currency: currencyCtx }));
+    // dispatch(fetchRatesAction({ coinsList, currency: currencyCtx }));
+    dispatch(fetchAndCalculate({ coinsList, currency: currencyCtx }))
+
   }
   function onDeleteCoin(coin) {
     const updatedBalance = balance.filter((el) => el.id !== coin.id);
@@ -55,7 +58,7 @@ export default function BalanceList({
       <Button onClick={() => onDeleteCoin(coinClicked)} icon="pi pi-times" />
     );
   }
-  
+
 
   return (
     <>
@@ -90,7 +93,7 @@ export default function BalanceList({
         </div>
       )}
 
-      {  <div>
+      {<div>
         <div className="card">
           <DataTable
             lazy={false}

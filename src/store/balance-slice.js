@@ -1,4 +1,4 @@
-import { createSlice } from "@reduxjs/toolkit";
+import {  createSlice } from "@reduxjs/toolkit";
 import { fetchRatesAction } from "./balance-actions";
 const initialChartData = {
   labels: ["a", "b", "c"],
@@ -85,27 +85,36 @@ const balanceSlice = createSlice({
   },
   extraReducers: {
     [fetchRatesAction.fulfilled]: (state, action) => {
-      console.log("DONE fetching rates");
-      let formattedResponse;
-      formattedResponse = action.payload.rates;
-      state.balance.map((coin) => {
-        const responseKeys = Object.keys(formattedResponse);
-        for (let i = 0; i < responseKeys.length; i++) {
-          let key = responseKeys[i];
-          if (key === coin.name.toLowerCase()) {
-            coin.rate =
-              formattedResponse[key][
+      console.log(action.payload);
+     
+        console.log("DONE fetching rates");
+        let formattedResponse;
+        formattedResponse = action.payload.rates;
+        state.balance.map((coin) => {
+          const responseKeys = Object.keys(formattedResponse);
+          for (let i = 0; i < responseKeys.length; i++) {
+            let key = responseKeys[i];
+            if (key === coin.name.toLowerCase()) {
+              coin.rate =
+                formattedResponse[key][
                 action.payload.currency ? action.payload.currency : "usd"
-              ];
-            break;
+                ];
+              break;
+            }
           }
-        }
-        return coin;
-      });
+          return coin;
+        });
+      
     },
   },
 });
 
+/* Thunk that combines fetching rates and calculatebalance so that calculate balance is loaded right after fetching rates
+https://stackoverflow.com/questions/63516716/redux-toolkit-is-it-possible-to-dispatch-other-actions-from-the-same-slice-in-o  */
+export const fetchAndCalculate = (params) => async (dispatch) => {
+  await dispatch(fetchRatesAction(params))
+  dispatch(balanceActions.calculateBalance())
+}
 export const balanceActions = balanceSlice.actions;
 
 export default balanceSlice.reducer;

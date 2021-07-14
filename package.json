@@ -1,5 +1,5 @@
 {
-  "name": "react-crypto-balance",
+  "name": "react-redux-crypto-balance",
   "version": "0.1.0",
   "private": true,
   "dependencies": {
