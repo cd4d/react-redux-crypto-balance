@@ -30,7 +30,7 @@ export function getIcons(balance) {
 
   balance = sortBalanceById(balance);
   if (coinsList && coinsList.length) {
-    let count = 0;
+    //let count = 0;
     let i = 0;
     //console.log(balance);
 
@@ -44,13 +44,13 @@ export function getIcons(balance) {
         ) {
           balance[i].image = coin.image;
           // increment both coins list and local balance loops
-          count++;
+          //count++;
           i++;
           //console.log(count, i, coin.id);
           break;
         } else {
           // increment only coins list
-          count++;
+          //count++;
           break;
         }
       }
