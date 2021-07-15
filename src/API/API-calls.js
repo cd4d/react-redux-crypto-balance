@@ -6,9 +6,9 @@ export async function fetchRates(coinsList, currency = "usd") {
   try {
     const response = await fetch(
       "https://api.coingecko.com/api/v3/simple/price?ids=" +
-      formattedCoinListForAPI +
-      "&vs_currencies=" +
-      currency.toLowerCase()
+        formattedCoinListForAPI +
+        "&vs_currencies=" +
+        currency.toLowerCase()
     );
     //
     if (!response.ok) {
@@ -26,6 +26,7 @@ export async function fetchRates(coinsList, currency = "usd") {
 }
 
 export async function fetchNews(coinsList) {
+  console.log(coinsList);
   const coinsListFormatted = coinsList.join("%2C");
   const newsDataURL = `https://contextualwebsearch-websearch-v1.p.rapidapi.com/api/search/NewsSearchAPI?q=${coinsListFormatted}&pageNumber=1&pageSize=10&autoCorrect=true&fromPublishedDate=null&toPublishedDate=null`;
   try {
@@ -42,6 +43,7 @@ export async function fetchNews(coinsList) {
       throw new Error(message);
     }
     if (response.status >= 200 && response.status <= 299) {
+      console.log("response: ", response);
       return response;
     }
   } catch (error) {

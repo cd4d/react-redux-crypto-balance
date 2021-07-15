@@ -1,4 +1,4 @@
-import {  createSlice } from "@reduxjs/toolkit";
+import { createSlice } from "@reduxjs/toolkit";
 import { fetchRatesAction } from "./balance-actions";
 const initialChartData = {
   labels: ["a", "b", "c"],
@@ -47,6 +47,7 @@ const initialBalance = {
 };
 const balanceSlice = createSlice({
   name: "balance",
+  
   initialState: initialBalance,
   reducers: {
     updateBalance(state, action) {
@@ -97,7 +98,7 @@ const balanceSlice = createSlice({
             if (key === coin.name.toLowerCase()) {
               coin.rate =
                 formattedResponse[key][
-                action.payload.currency ? action.payload.currency : "usd"
+                  action.payload.currency ? action.payload.currency : "usd"
                 ];
               break;
             }
@@ -112,9 +113,9 @@ const balanceSlice = createSlice({
 /* Thunk that combines fetching rates and calculatebalance so that calculate balance is loaded right after fetching rates
 https://stackoverflow.com/questions/63516716/redux-toolkit-is-it-possible-to-dispatch-other-actions-from-the-same-slice-in-o  */
 export const fetchAndCalculate = (params) => async (dispatch) => {
-  await dispatch(fetchRatesAction(params))
-  dispatch(balanceActions.calculateBalance())
-}
+  await dispatch(fetchRatesAction(params));
+  dispatch(balanceActions.calculateBalance());
+};
 export const balanceActions = balanceSlice.actions;
 
 export default balanceSlice.reducer;

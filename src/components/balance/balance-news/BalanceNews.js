@@ -1,40 +1,36 @@
 import { React, useState } from "react";
 import { Paginator } from "primereact/paginator";
 import { Button } from "primereact/button";
-import { fetchNews } from "../../../API/API-calls";
-import newsSample from "../../../news-sample.json";
 import { useSelector, useDispatch } from "react-redux";
-import {  } from "../../../store/news-slice";
+import { fetchNewsAction } from "../../../store/news-slice";
+import { uiActions } from "../../../store/ui-slice";
 export default function BalanceNews(props) {
   const newsPerPage = 5;
-  const [error, setError] = useState(null);
-  const [isNewsLoading, setIsNewsLoading] = useState(false);
+
   const [indexFirstNews, setIndexFirstNews] = useState(0);
   const [indexLastNews, setIndexLastNews] = useState(newsPerPage);
-  const [newsData, setNewsData] = useState(newsSample);
-
+  const newsData = useSelector((state) => state.newsReducer.newsData);
+  const error = useSelector((state) => state.uiReducer.error.news);
+  const isNewsLoading = useSelector((state) => state.uiReducer.isLoading.news);
   let currentBalance = props.balance;
   let coinsList = currentBalance.map((coin) => coin.name);
-const dispatch = useDispatch()
+  const dispatch = useDispatch();
   async function refreshNews() {
-    setIsNewsLoading(true);
+    // setIsNewsLoading(true);
     if (coinsList) {
-      // try {
-      //   const response = await fetchNews(coinsList);
-      //   if (response.error) {
-      //     throw new Error(error.errorData.message);
-      //   }
-      //   setNewsData(await response.json());
-      // } catch (error) {
-      //   console.log("error: ", error);
-      //   setError("Error fetching news.");
-      // }
-      dispatch()
-      setIsNewsLoading(false);
+      console.log("fetching news for: ", coinsList);
+
+      dispatch(fetchNewsAction(coinsList));
     }
   }
   function onCloseError() {
-    setError(null);
+    // setError(null);
+    dispatch(
+      uiActions.changeError({
+        type: "news",
+        value: null,
+      })
+    );
   }
   function paginate(e) {
     setIndexFirstNews(e.page * newsPerPage + 1);
@@ -47,7 +43,7 @@ const dispatch = useDispatch()
         <div className="col-md-5">
           <h3>News</h3>
         </div>
-
+        {/* Refresh news button */}
         <div className="col-md-2">
           <Button
             icon="pi pi-refresh"
@@ -56,12 +52,13 @@ const dispatch = useDispatch()
           ></Button>
         </div>
       </div>
+      {/* Loading spinner */}
       {isNewsLoading && !error && (
         <div>
           <i className="pi pi-spin pi-spinner" style={{ fontSize: "2rem" }}></i>
         </div>
       )}
-
+      {/* Error message */}
       {error && (
         <div className="alert alert-danger mt-3">
           <p>{error}</p>

@@ -8,16 +8,15 @@ import CurrencyContext from "../../../../store/currency-context";
 import { useSelector, useDispatch } from "react-redux";
 import { addCoinActions } from "../../../../store/addCoin-slice";
 import { uiActions } from "../../../../store/ui-slice";
-export default function AddCoin({
-  balance,
-  onUpdateBalance
-}) {
+export default function AddCoin({ balance, onUpdateBalance }) {
   const dispatch = useDispatch();
   const inputRef = useRef(null);
   const currencyCtx = useContext(CurrencyContext);
   const addCoinState = useSelector((state) => state.addCoinReducer);
-  const addCoinInputDisplayed = useSelector((state) => state.uiReducer.addCoinDisplayed);
-
+  const addCoinInputDisplayed = useSelector(
+    (state) => state.uiReducer.addCoinDisplayed
+  );
+  const error = useSelector((state) => state.uiReducer.error.addCoin);
   //format currency: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number/toLocaleString
   const formatCurrency = (value, inputCurrency) => {
     return value.toLocaleString("en-US", {
@@ -118,15 +117,21 @@ export default function AddCoin({
         [addCoinState.selectedCoin.id],
         currencyCtx
       );
-     
+
       //ex. {"cardano": {"usd": 1.31 }}
-      // TODO add error message
       if (response.status >= 200 && response.status <= 299) {
         const formattedResponse = await response.json();
         console.log(formattedResponse);
         currentRate = await formattedResponse[addCoinState.selectedCoin.id][
           currencyCtx
         ];
+      } else {
+        dispatch(
+          uiActions.changeError({
+            type: "addCoin",
+            value: "Cannot fetch rate of coin, using $1 rate.",
+          })
+        );
       }
       inputCoin(+currentRate, "rate");
     }
@@ -134,10 +139,10 @@ export default function AddCoin({
     if (addCoinState.selectedCoin.id) {
       getRates();
     }
-  }, [addCoinState.selectedCoin.id, currencyCtx, inputCoin]);
+  }, [addCoinState.selectedCoin.id, currencyCtx, dispatch, inputCoin]);
 
   function toggleAddCoin() {
-    dispatch(uiActions.toggleAddCoinDisplayed())
+    dispatch(uiActions.toggleAddCoinDisplayed());
   }
 
   function addCoin(coin) {
@@ -166,7 +171,7 @@ export default function AddCoin({
       addCoinActions.setStateReducer({
         type: "replaceState",
         field: "searchInput",
-        data:"",
+        data: "",
       })
     );
     // setSelectedCoin({ id: "", amount: 0 });
@@ -177,7 +182,12 @@ export default function AddCoin({
         data: { id: "", amount: 0 },
       })
     );
-
+    dispatch(
+      uiActions.changeError({
+        type: "addCoin",
+        value: null,
+      })
+    );
     toggleAddCoin();
   }
 
@@ -186,13 +196,14 @@ export default function AddCoin({
       {addCoinInputDisplayed ? (
         <div className="row mt-2 mb-2">
           <h6>
-            Add coin: {addCoinState.selectedCoin.name}{" "}
+            Add coin: {!error && addCoinState.selectedCoin.name}{" "}
             {addCoinState.selectedCoin.amount > 0 &&
               addCoinState.selectedCoin.rate &&
               formatCurrency(
                 addCoinState.selectedCoin.rate *
                   +addCoinState.selectedCoin.amount
               )}
+            {error && <span className="text-danger">{error}</span>}
           </h6>
           <div className="col">
             <div>

@@ -44,7 +44,6 @@ export default function BalanceList({
   function onRefreshRates() {
     // triggerRatesUpdate();
     const coinsList = balance.map((coin) => coin.name);
-    // dispatch(fetchRatesAction({ coinsList, currency: currencyCtx }));
     dispatch(fetchAndCalculate({ coinsList, currency: currencyCtx }))
 
   }
@@ -100,7 +99,7 @@ export default function BalanceList({
             value={balance}
             loading={isBalanceLoading}
             autoLayout={false}
-            paginator={false}
+            paginator={true}
             rows={pageSize}
             sortField="value"
             sortOrder={-1}

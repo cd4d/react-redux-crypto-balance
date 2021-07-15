@@ -4,9 +4,8 @@ import { fetchRates } from "../API/API-calls";
 export const fetchRatesAction = createAsyncThunk(
   "balance/fetchRates",
   async (action) => {
-    const response = await fetchRates(action.coinsList, action.currency)
-    const data = await response.json()
+    const response = await fetchRates(action.coinsList, action.currency);
+    const data = await response.json();
     return { rates: data, currency: action.currency };
   }
 );
-
