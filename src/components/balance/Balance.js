@@ -51,7 +51,7 @@ export default function Balance() {
         <div className="col-md-5 col-sm-12 ">
           <BalanceChart></BalanceChart>
 
-          <BalanceNews balance={balance}></BalanceNews>
+          <BalanceNews ></BalanceNews>
         </div>
       </div>
     </div>

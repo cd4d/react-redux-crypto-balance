@@ -4,16 +4,16 @@ import { Button } from "primereact/button";
 import { useSelector, useDispatch } from "react-redux";
 import { fetchNewsAction } from "../../../store/news-slice";
 import { uiActions } from "../../../store/ui-slice";
-export default function BalanceNews(props) {
+export default function BalanceNews() {
   const newsPerPage = 5;
 
   const [indexFirstNews, setIndexFirstNews] = useState(0);
   const [indexLastNews, setIndexLastNews] = useState(newsPerPage);
+  const balance = useSelector((state) => state.balanceReducer.balance);
   const newsData = useSelector((state) => state.newsReducer.newsData);
   const error = useSelector((state) => state.uiReducer.error.news);
   const isNewsLoading = useSelector((state) => state.uiReducer.isLoading.news);
-  let currentBalance = props.balance;
-  let coinsList = currentBalance.map((coin) => coin.name);
+  let coinsList = balance.map((coin) => coin.name);
   const dispatch = useDispatch();
   async function refreshNews() {
     // setIsNewsLoading(true);
