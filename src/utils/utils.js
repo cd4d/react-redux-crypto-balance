@@ -1,4 +1,4 @@
-import coinsList from "../../../../coins-list-sorted.json";
+import coinsList from "../coins-list-sorted.json";
 export function formatCurrency(value, inputCurrency) {
   if (value) {
     return value.toLocaleString("en-US", {
