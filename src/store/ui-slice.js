@@ -5,7 +5,7 @@ import { fetchNewsAction } from "./news-slice";
 const uiSlice = createSlice({
   name: "uiSlice",
   initialState: {
-    error: { rates: null, news: null,addCoin:null },
+    error: { rates: null, news: null, addCoin: null },
     isLoading: { rates: false, news: false },
     addCoinDisplayed: false,
   },
@@ -31,7 +31,7 @@ const uiSlice = createSlice({
     },
     [fetchRatesAction.rejected]: (state) => {
       state.isLoading.rates = false;
-      state.error.rates = "Error fetching rates.";
+      state.error.rates = "Error fetching rates!";
     },
     [fetchNewsAction.pending]: (state) => {
       state.isLoading.news = true;
