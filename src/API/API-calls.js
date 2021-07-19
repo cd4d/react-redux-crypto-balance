@@ -2,7 +2,7 @@
 
 export async function fetchRates(coinsList, currency = "usd") {
   const formattedCoinListForAPI = coinsList.join("%2C");
-  console.log("fetching rates for: ", coinsList);
+  // console.log("fetching rates for: ", coinsList);
   try {
     const response = await fetch(
       "https://api.coingecko.com/api/v3/simple/price?ids=" +
@@ -16,7 +16,7 @@ export async function fetchRates(coinsList, currency = "usd") {
       throw new Error(message);
     }
     if (response.status >= 200 && response.status <= 299) {
-      console.log("got rates: ", await response);
+      // console.log("got rates: ", await response);
       return response;
     }
   } catch (error) {

@@ -1,7 +1,7 @@
 import { React, useEffect, useContext } from "react";
 import BalanceList from "./balance-list/BalanceList";
 import BalanceChart from "./balance-chart/BalanceChart";
-import  BalanceNews from "./balance-news/BalanceNews";
+import BalanceNews from "./balance-news/BalanceNews";
 import { useSelector, useDispatch } from "react-redux";
 import CurrencyContext from "../../store/currency-context";
 import { balanceActions, fetchAndCalculate } from "../../store/balance-slice";
@@ -12,7 +12,7 @@ export default function Balance() {
   /**** REDUX ****/
   const balance = useSelector((state) => state.balanceReducer.balance);
   const dispatch = useDispatch();
-  console.log(balance);
+  // console.log(balance);
 
   useEffect(() => {
     dispatch(balanceActions.calculateBalance());
@@ -34,10 +34,10 @@ export default function Balance() {
   }, [currencyCtx, dispatch]);
 
   const updateBalance = (newBalance) => {
-    console.log(newBalance);
+    // console.log(newBalance);
     dispatch(balanceActions.updateBalance(newBalance));
 
-    console.log("updating balance");
+    // console.log("updating balance");
     dispatch(balanceActions.calculateBalance());
   };
   return (
@@ -51,7 +51,7 @@ export default function Balance() {
         <div className="col-md-5 col-sm-12 ">
           <BalanceChart></BalanceChart>
 
-          <BalanceNews ></BalanceNews>
+          <BalanceNews></BalanceNews>
         </div>
       </div>
     </div>

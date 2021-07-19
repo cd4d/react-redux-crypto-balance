@@ -1,3 +1,5 @@
+import './wdyr.js'; // <--- first import why did you render utility
+
 import React from "react";
 import ReactDOM from "react-dom";
 import "./index.css";
