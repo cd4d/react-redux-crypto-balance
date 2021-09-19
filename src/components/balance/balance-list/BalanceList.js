@@ -1,4 +1,5 @@
 import { React, useContext } from "react";
+import { cloneDeep } from "lodash";
 import { DataTable } from "primereact/datatable";
 import { Column } from "primereact/column";
 import { Button } from "primereact/button";
@@ -25,7 +26,8 @@ export default function BalanceList({
   const dispatch = useDispatch();
   // editing amount
   const onEditorAmountChange = (tableProps, event) => {
-    let updatedBalance = [...tableProps.value];
+    // let updatedBalance = [...tableProps.value] does NOT work, need deep cloning
+    let updatedBalance = cloneDeep(tableProps.value)
     // props is the table event
     updatedBalance[tableProps.rowIndex][tableProps.field] = event.target.value;
     onUpdateBalance(updatedBalance);
