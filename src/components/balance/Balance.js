@@ -43,16 +43,18 @@ export default function Balance() {
   return (
     <div className="container">
       <div className="row">
-        <div className="col-md-7 col-sm-12">
+        <div className="col-md-8 col-sm-12">
           <BalanceList
             onUpdateBalance={(newBalance) => updateBalance(newBalance)}
           ></BalanceList>
         </div>
-        <div className="col-md-5 col-sm-12 ">
-          <BalanceChart></BalanceChart>
+        {balance.length > 0 && (
+          <div className="col-md-4 col-sm-12 ">
+            <BalanceChart></BalanceChart>
 
-          <BalanceNews></BalanceNews>
-        </div>
+            <BalanceNews></BalanceNews>
+          </div>
+        )}
       </div>
     </div>
   );

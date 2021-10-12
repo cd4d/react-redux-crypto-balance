@@ -207,11 +207,11 @@ export default function AddCoin({ balance, onUpdateBalance }) {
           </h6>
           <div className="col">
             <div>
-              {/* Add coin id input */}
+              {/* Input name of coin */}
               <InputText
                 ref={inputRef}
                 id="search-box"
-                placeholder="Coin name"
+                placeholder="Start typing (3 letters)"
                 onChange={(e) => {
                   setSearchCoin(e.target.value);
                 }}

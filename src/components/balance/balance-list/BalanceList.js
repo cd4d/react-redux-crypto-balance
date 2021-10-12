@@ -6,18 +6,19 @@ import { Button } from "primereact/button";
 import AddCoin from "./add-coin/addCoin";
 import { formatCurrency } from "../../../utils/utils";
 import CurrencyContext from "../../../store/currency-context";
+import EmptyBalance from "../EmptyBalance";
 
 import "./balance-list.css";
 import { useSelector, useDispatch } from "react-redux";
 
 import { fetchAndCalculate } from "../../../store/balance-slice";
 
-export default function BalanceList({
-  onUpdateBalance
-}) {
+export default function BalanceList({ onUpdateBalance }) {
   const pageSize = 5;
   const currencyCtx = useContext(CurrencyContext);
-  const isBalanceLoading = useSelector((state) => state.uiReducer.isLoading.rates);
+  const isBalanceLoading = useSelector(
+    (state) => state.uiReducer.isLoading.rates
+  );
   const error = useSelector((state) => state.uiReducer.error.rates);
   const balance = useSelector((state) => state.balanceReducer.balance);
   const addCoinInputDisplayed = useSelector(
@@ -27,7 +28,7 @@ export default function BalanceList({
   // editing amount
   const onEditorAmountChange = (tableProps, event) => {
     // let updatedBalance = [...tableProps.value] does NOT work, need deep cloning
-    let updatedBalance = cloneDeep(tableProps.value)
+    let updatedBalance = cloneDeep(tableProps.value);
     // props is the table event
     updatedBalance[tableProps.rowIndex][tableProps.field] = event.target.value;
     onUpdateBalance(updatedBalance);
@@ -46,8 +47,7 @@ export default function BalanceList({
   function onRefreshRates() {
     // triggerRatesUpdate();
     const coinsList = balance.map((coin) => coin.name);
-    dispatch(fetchAndCalculate({ coinsList, currency: currencyCtx }))
-
+    dispatch(fetchAndCalculate({ coinsList, currency: currencyCtx }));
   }
   function onDeleteCoin(coin) {
     const updatedBalance = balance.filter((el) => el.id !== coin.id);
@@ -59,7 +59,6 @@ export default function BalanceList({
       <Button onClick={() => onDeleteCoin(coinClicked)} icon="pi pi-times" />
     );
   }
-
 
   return (
     <>
@@ -75,7 +74,7 @@ export default function BalanceList({
         <>
           <AddCoin balance={balance} onUpdateBalance={onUpdateBalance} />
           {/* Refresh rates button  */}
-          {!addCoinInputDisplayed && (
+          {!addCoinInputDisplayed && balance.length > 0 && (
             <button
               type="button"
               className="btn btn-secondary mt-1 me-1 btn-sm float-end"
@@ -94,56 +93,59 @@ export default function BalanceList({
         </div>
       )}
 
-      {<div>
-        <div className="card">
-          <DataTable
-            lazy={false}
-            value={balance}
-            loading={isBalanceLoading}
-            autoLayout={false}
-            paginator={true}
-            rows={pageSize}
-            sortField="value"
-            sortOrder={-1}
-            className="balance-list-table"
-          >
-            <Column field="name" header="Name" sortable></Column>
-            <Column
-              field="symbol"
-              header="Symbol"
-              sortable
-              className="d-none d-sm-none d-lg-table-cell"
-            ></Column>
-            <Column
-              field="rate"
-              header="Rate"
-              body={(coin) =>
-                formatCurrency(coin.rate, currencyCtx ? currencyCtx : "usd")
-              }
-              sortable
-              className={error ? "table-text-error" : ""}
-            ></Column>
-            <Column
-              field="amount"
-              header="Amount"
-              sortable
-              editor={(props) => amountEditor(props)}
-            ></Column>
-            <Column
-              field="value"
-              header="Value"
-              sortable
-              body={(coin) =>
-                formatCurrency(coin.value, currencyCtx ? currencyCtx : "usd")
-              }
-            ></Column>
-            <Column
-              body={(coinClicked) => deleteButton(coinClicked)}
-              header="Delete"
-            ></Column>
-          </DataTable>
+      {balance.length > 0 ? (
+        <div>
+          <div className="card">
+            <DataTable
+              lazy={false}
+              value={balance}
+              loading={isBalanceLoading}
+              autoLayout={false}
+              paginator={true}
+              rows={pageSize}
+              sortOrder={-1}
+              className="balance-list-table"
+            >
+              <Column field="name" header="Name" sortable></Column>
+              <Column
+                field="symbol"
+                header="Symbol"
+                sortable
+                className="d-none d-sm-none d-lg-table-cell"
+              ></Column>
+              <Column
+                field="rate"
+                header="Rate"
+                body={(coin) =>
+                  formatCurrency(coin.rate, currencyCtx ? currencyCtx : "usd")
+                }
+                sortable
+                className={error ? "table-text-error" : ""}
+              ></Column>
+              <Column
+                field="amount"
+                header="Amount"
+                sortable
+                editor={(props) => amountEditor(props)}
+              ></Column>
+              <Column
+                field="value"
+                header="Value"
+                sortable
+                body={(coin) =>
+                  formatCurrency(coin.value, currencyCtx ? currencyCtx : "usd")
+                }
+              ></Column>
+              <Column
+                body={(coinClicked) => deleteButton(coinClicked)}
+                header="Delete"
+              ></Column>
+            </DataTable>
+          </div>
         </div>
-      </div>}
+      ) : (
+        <EmptyBalance />
+      )}
     </>
   );
 }
