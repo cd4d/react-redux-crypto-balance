@@ -14,7 +14,14 @@
 .table-text-error{
   color:crimson
 }
-.amount-input {
+
+
+.image-coin {
+  max-width: 18px;
+  text-align: center;
+}
+
+.amount-input  > input{
   width: 5rem;
 }
 /* Media queries */

@@ -50,6 +50,8 @@ export default function BalanceList({ onUpdateBalance }) {
     dispatch(fetchAndCalculate({ coinsList, currency: currencyCtx }));
   }
   function onDeleteCoin(coin) {
+    console.log(coin);
+
     const updatedBalance = balance.filter((el) => el.id !== coin.id);
     onUpdateBalance(updatedBalance);
   }
@@ -112,6 +114,19 @@ export default function BalanceList({ onUpdateBalance }) {
                 header="Symbol"
                 sortable
                 className="d-none d-sm-none d-lg-table-cell"
+              ></Column>
+              <Column
+                field="image"
+                header="Icon"
+                sortable={false}
+                className="d-none d-sm-none d-lg-table-cell"
+                body={(coin) => (
+                  <img
+                    className="image-coin"
+                    src={coin.image}
+                    alt={coin.name}
+                  ></img>
+                )}
               ></Column>
               <Column
                 field="rate"
