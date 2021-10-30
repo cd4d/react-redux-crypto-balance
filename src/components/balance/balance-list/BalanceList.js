@@ -50,8 +50,6 @@ export default function BalanceList({ onUpdateBalance }) {
     dispatch(fetchAndCalculate({ coinsList, currency: currencyCtx }));
   }
   function onDeleteCoin(coin) {
-    console.log(coin);
-
     const updatedBalance = balance.filter((el) => el.id !== coin.id);
     onUpdateBalance(updatedBalance);
   }

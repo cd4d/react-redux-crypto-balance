@@ -121,7 +121,6 @@ export default function AddCoin({ balance, onUpdateBalance }) {
       //ex. {"cardano": {"usd": 1.31 }}
       if (response.status >= 200 && response.status <= 299) {
         const formattedResponse = await response.json();
-        console.log(formattedResponse);
         currentRate = await formattedResponse[addCoinState.selectedCoin.id][
           currencyCtx
         ];

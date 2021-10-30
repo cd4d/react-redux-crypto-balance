@@ -18,8 +18,6 @@ export default function BalanceNews() {
   async function refreshNews() {
     // setIsNewsLoading(true);
     if (coinsList) {
-      console.log("fetching news for: ", coinsList);
-
       dispatch(fetchNewsAction(coinsList));
     }
   }

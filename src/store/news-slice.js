@@ -5,7 +5,6 @@ import { fetchNews } from "../API/API-calls";
 export const fetchNewsAction = createAsyncThunk(
   "news/fetchNews",
   async (coinsList) => {
-    console.log("fetching news:", coinsList);
     const response = await fetchNews(coinsList);
     const data = await response.json();
     return { newsData: data };
