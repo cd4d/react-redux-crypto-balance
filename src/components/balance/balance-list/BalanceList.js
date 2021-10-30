@@ -1,6 +1,7 @@
 import { React, useContext } from "react";
 import { cloneDeep } from "lodash";
 import { DataTable } from "primereact/datatable";
+import { InputNumber } from "primereact/inputnumber";
 import { Column } from "primereact/column";
 import { Button } from "primereact/button";
 import AddCoin from "./add-coin/addCoin";
@@ -35,12 +36,15 @@ export default function BalanceList({ onUpdateBalance }) {
   };
   const amountEditor = (tableProps) => {
     return (
-      <input
-        type="number"
+      <InputNumber
         value={tableProps.rowData["amount"]}
-        onChange={(event) => onEditorAmountChange(tableProps, event)}
+        onValueChange={(event) => onEditorAmountChange(tableProps, event)}
         min={0}
         className="amount-input"
+        showButtons
+        mode="decimal"
+        minFractionDigits={1}
+        maxFractionDigits={2}
       />
     );
   };
