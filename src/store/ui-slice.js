@@ -1,14 +1,14 @@
 import { createSlice } from "@reduxjs/toolkit";
 import { fetchRatesAction } from "./balance-actions";
 import { fetchNewsAction } from "./news-slice";
-
+const initialState = {
+  error: { rates: null, news: null, addCoin: null },
+  isLoading: { rates: false, news: false },
+  addCoinDisplayed: false,
+}
 const uiSlice = createSlice({
   name: "uiSlice",
-  initialState: {
-    error: { rates: null, news: null, addCoin: null },
-    isLoading: { rates: false, news: false },
-    addCoinDisplayed: false,
-  },
+  initialState,
   reducers: {
     changeIsLoading(state, action) {
       state.isLoading[action.payload.type] = action.payload.value;
@@ -18,6 +18,14 @@ const uiSlice = createSlice({
     },
     toggleAddCoinDisplayed(state) {
       state.addCoinDisplayed = !state.addCoinDisplayed;
+    },
+    setAddCoinDisplayed(state, action) {
+      if (typeof action.payload === 'boolean') {
+        state.addCoinDisplayed = action.payload;
+      }
+    },
+    resetState(state) {
+      Object.assign(state, initialState);
     },
   },
   extraReducers: {

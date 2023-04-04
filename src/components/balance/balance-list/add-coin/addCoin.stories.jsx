@@ -1,92 +1,60 @@
 import React from "react";
-import { Provider } from "react-redux";
+import { Provider, useDispatch } from "react-redux";
 import AddCoin from "./addCoin";
-import store from "../../../../store/redux-store";
-import { configureStore, createSlice } from "@reduxjs/toolkit";
+import reduxStore from "../../../../store/redux-store";
+import { uiActions } from "../../../../store/ui-slice";
 
-// A super-simple mock of the state of the store
-export const MockedState = {
-  uiState: {
-    addCoinDisplayed: false,
-    error: { rates: null, news: null, addCoin: null },
-  },
-  addCoinState: {
-    searchInput: "",
-    resultSearch: [],
-    selectedCoin: { id: "", amount: 0 },
-  },
-};
-
-// A super-simple mock of a redux store
-const Mockstore = ({ addCoinState, children }) => (
-  <Provider
-    store={configureStore({
-      reducer: {
-        uiReducer: createSlice({
-          name: "uiSlice",
-          initialState: addCoinState.uiState,
-          reducers: {
-            updateCoinDisplayed: (state, action) => {
-              const { addCoinDisplayed } = action.payload;
-              state.uiReducer.addCoinDisplayed = addCoinDisplayed;
-            },
-          },
-        }).reducer,
-        addCoinReducer: createSlice({
-          name: "addCoinSlice",
-          initialState: addCoinState.addCoinState,
-          reducers: {},
-        }).reducer,
-      },
-    })}
-  >
-    {children}
-  </Provider>
-);
 
 export default {
   title: "AddCoin",
   component: AddCoin,
-  decorators: [(story) => <Provider store={store}>{story()}</Provider>],
+  decorators: [
+    (Story) => (
+      <Provider store={reduxStore}>
+        <Story />
+      </Provider>
+    ),
+  ],
 };
 
-const Template = (args) => <AddCoin {...args} />;
+const Template = (args) => {
+  const dispatch = useDispatch();
+
+  React.useEffect(() => {
+    dispatch(uiActions.resetState());
+  });
+  return <AddCoin {...args} />;
+};
 
 export const Default = Template.bind({});
-Default.decorators = [
-  (story) => <Mockstore addCoinState={MockedState}>{story()}</Mockstore>,
-];
+
 
 export const InputDisplayed = Template.bind({});
 InputDisplayed.decorators = [
-  (story) => (
-    <Mockstore
-      addCoinState={{
-        ...MockedState,
-        uiState: {
-          ...MockedState.uiState,
-          addCoinDisplayed: true,
-        },
-      }}
-    >
-      {story()}
-    </Mockstore>
-  ),
+  (Story) => {
+    const dispatch = useDispatch();
+
+    React.useEffect(() => {
+      dispatch(uiActions.setAddCoinDisplayed(true));
+    });
+    return <Story />;
+  },
 ];
+
 export const Error = Template.bind({});
 Error.decorators = [
-  (story) => (
-    <Mockstore
-      addCoinState={{
-        ...MockedState,
-        uiState: {
-          ...MockedState.uiState,
-          addCoinDisplayed: true,
-          error: { rates: null, news: null, addCoin: "Error adding coin" },
-        },
-      }}
-    >
-      {story()}
-    </Mockstore>
-  ),
+  (Story) => {
+    const dispatch = useDispatch();
+
+    React.useEffect(() => {
+      dispatch(
+        uiActions.changeError({
+          type: "addCoin",
+          value: "Error adding coin!",
+        })
+      );
+      dispatch(uiActions.setAddCoinDisplayed(true));
+    });
+    return <Story />;
+  },
 ];
